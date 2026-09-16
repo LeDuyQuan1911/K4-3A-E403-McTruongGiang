@@ -17,15 +17,7 @@
 
 ## 02 · BẰNG CHỨNG BAN ĐẦU
 
-**Dự kiến mining (chuẩn B):**
-- Mining `data/vlearn-pack/` (6 transcript + 2 slide): đếm số concept lặp lại giữa các transcript, số chỗ thiếu trích dẫn nguồn gốc
-- So sánh: cho AI sinh kịch bản từ transcript → đếm bao nhiêu câu có trích dẫn đúng vs bịa nguồn vs không có nguồn
-
-**Dự kiến phỏng vấn (chuẩn evidence riêng Track C — ≥3 người):**
-- Phỏng vấn Studio team theo Mom Test: *"Lần gần nhất viết kịch bản cho 1 bài giảng, bạn phải tra cứu bao nhiêu nguồn? Phần nào tốn thời gian nhất?"*
-- BTC sẽ bố trí đầu mối Studio team — hỏi ở kênh chung Discord
-
-> ⚠ Không copy số liệu, snippet hay mã nguồn thật ra ngoài `data/` khi chưa được nhóm hoặc TA cho phép.
+Đã hỏi qua gần 20 người trong buổi học bao gồm cả lab coach và học viên, có rất nhiều người đã gặp trường hợp 2 nguồn đưa tin/số liệu trái ngược nhau, dẫn đến việc rất khó để có thể xác định đâu là nguồn tin chính xác, hoặc nguồn cũ, hoặc bị miss nguồn dẫn đến việc phải tìm lại khi nội dung gần xong. Trên 90% số người được hỏi nếu có một công cụ tự tìm nguồn đáng tin thì liệu họ có dùng không, họ vẫn trả lời khá đến rất cần.
 
 ---
 
@@ -51,7 +43,7 @@
 
 ## 04 · NGƯỜI THỬ & PHÂN CÔNG
 
-**Willing users dự kiến:** ≥2 người
+**Willing users dự kiến:** 
 - Tai Thanh - Lab Coach
 - Mây - Lab Coach
 - Nguyễn Hồng Thái - Học Viên
