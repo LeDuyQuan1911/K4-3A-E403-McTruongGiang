@@ -4,14 +4,14 @@
 
 ## 👥 Thành viên nhóm & Phân công vai trò
 
-**Lớp:** 3A · **Phòng:** E403 · **Cụm:** ____ · **Track:** ____
+**Lớp:** 3A · **Phòng:** E403 · **Cụm:** ____ · **Track:** C3 — Research-to-Script (Lesson Studio)
 
 | Họ và Tên | Mã Học Viên | Vai trò chính | Phần việc đảm nhiệm trong dự án |
 |---|---|---|---|
-|  |  |  |  |
-|  |  |  |  |
-|  |  |  |  |
-|  |  |  |  |
+| Lê Duy Quân |  | Nhóm trưởng | Form chương trình, prototype (RAG + UI), eval |
+| Bùi Trọng Trịnh |  | Dev | Prototype (RAG pipeline + UI), prompt engineering |
+| Nguyễn Lê Phúc Thắng |  | Dev + Evidence | Code, viết khảo sát, spec, golden set |
+| Vũ Minh Hoàng |  | Khảo sát + Validation | Khảo sát Studio team, user test, demo |
 
 ## 📁 Cấu trúc repo
 
