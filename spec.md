@@ -1,55 +1,96 @@
-# Template AI Spec *(spec.md — commit trước hạn chốt spec: 21:00 17/9, tại CP4 · quality bar chốt từ thời điểm nộp)*
-
-> Cấu trúc phủ đúng "SPEC 8 phần" của chương trình: Bằng chứng (§1-§2) · Lát cắt (§4) · Canvas (đính kèm CP1) · Augment/Automate (§4) · 4 đường đi của trải nghiệm (§6) · Kiểu lỗi (§5) · Kiểm thử (§7) · Phân công (§8). Hướng dẫn viết từng mục: `02-guide.md`.
-
-```markdown
-# AI SPEC — [Tên lát cắt] · Nhóm [XX] · Zone [X]
-Hướng: [ ] A — VLearn  [ ] B — Trợ lý Học viên  [ ] C — Làn mở
-Loại: [ ] Tối ưu tính năng có sẵn  [ ] Tính năng mới
+# AI SPEC — Research-to-Script: AI nghiên cứu nguồn → draft kịch bản có trích dẫn · Nhóm Lê Duy Quân · Lớp 3A
+Hướng: [x] C — Lesson Studio · Đề C3
+Loại: [x] Tính năng mới
 
 ## §1. User & Job
-- Job executor + workflow (đính kèm worksheet JTBD / ảnh sơ đồ):
-- Core JTBD (không tên sản phẩm/AI trong câu):
-- Problem statement (KHÔNG chữ AI):
-- Evidence (chuẩn A và/hoặc B — log đầy đủ trong repo):
-  - Số liệu mining / kết quả khảo sát (n = ?, % xác nhận):
-  - ≥5 quote/ví dụ nguyên văn + nguồn:
+- **Job executor:** Người viết kịch bản video giáo dục (Studio team) — workflow: nhận đề bài → tra cứu transcript/slide → viết kịch bản → biên tập viên duyệt → dựng video
+- **Core JTBD:** Khi viết kịch bản cho bài giảng mới, người viết muốn tìm nhanh nội dung chính xác từ tài liệu gốc để đảm bảo kịch bản có căn cứ và trích dẫn được nguồn
+- **Problem statement (KHÔNG chữ AI):** Người viết kịch bản phải tra cứu thủ công hàng chục trang transcript/slide để tìm đoạn liên quan, mất hàng giờ mỗi kịch bản; nếu bỏ sót nguồn hoặc trích sai, kịch bản thiếu tin cậy và phải sửa nhiều vòng
+- **Evidence** (chuẩn A — khảo sát + phỏng vấn):
+  - Số liệu: Khảo sát gần 20 người (lab coach + học viên), >90% nói rất cần công cụ tự tìm nguồn đáng tin
+  - Nhiều người gặp trường hợp 2 nguồn đưa số liệu trái ngược → rất khó xác định nguồn nào chính xác
+  - Tình huống bị miss nguồn, phải tìm lại khi nội dung gần xong → lãng phí thời gian
+  - *(Sẽ bổ sung thêm quote nguyên văn + mining data tại CP4)*
 
 ## §2. Impact & quyết định chọn
-- Bảng impact ≥3 ứng viên (bao nhiêu người · tần suất · tốn gì mỗi lần · khả thi):
-- Ứng viên ĐÃ LOẠI + vì sao:
-- Ứng viên CHỌN + vì sao (bằng số):
+
+| Ứng viên | Bao nhiêu người | Tần suất | Tốn gì mỗi lần | Build nổi? | Chọn? |
+|---|---|---|---|---|---|
+| **C3: Research→Script có trích dẫn** | Studio team (~5-10 người) + bất kỳ ai viết nội dung giáo dục | Mỗi kịch bản mới (hàng tuần) | 2-4 giờ tra cứu thủ công | ✅ RAG + citation | **✅ CHỌN** |
+| C2: QA kịch bản sượng | Studio team (~5 người) | Mỗi kịch bản | 30-60 phút review | Cần NLP tiếng Việt chuyên sâu | ❌ Kỹ thuật quá nặng |
+| C1: Knowledge graph → quiz | Giảng viên (~3-5 người) | Mỗi chương | 1-2 giờ soạn quiz | Cần graph extraction phức tạp | ❌ Scope quá lớn |
+
+- **Ứng viên ĐÃ LOẠI:** C2 (NLP tiếng Việt quá chuyên sâu, khó build trong 47h), C1 (scope graph extraction + adaptive learning quá lớn)
+- **Ứng viên CHỌN:** C3 — pain tra cứu có số (>90% xác nhận cần), kỹ thuật RAG quen thuộc, lát cắt gọn
 
 ## §3. Giải pháp tương tự đã nghiên cứu
-- [Sản phẩm 1]: flow / đáng học / đáng né / mình khác gì
-- [Sản phẩm 2]: ...
+- **NotebookLM (Google):** Upload tài liệu → AI trả lời kèm cite nguồn. Đáng học: citation trỏ đúng đoạn nguồn. Đáng né: không sinh "kịch bản" dạng đọc, chỉ trả lời Q&A. Mình khác: output là kịch bản hoàn chỉnh, không phải câu trả lời.
+- **ChatGPT + upload PDF:** Đáng học: sinh văn bản mượt. Đáng né: hay bịa nguồn, trích dẫn sai trang, không phân biệt confidence. Mình khác: từ chối sinh khi không có nguồn thay vì bịa; gắn trạng thái CITED/NEEDS_VERIFY/NO_SOURCE.
 
 ## §4. Thiết kế
-- Lát cắt MỘT CÂU (1 user · 1 việc · 1 quyết định AI · 1 kết quả):
-- Non-goals (≥3 thứ KHÔNG build):
-- Mức prototype nhắm tới: [ ] Sketch [ ] Mock [ ] Working — phần nào mock, phần nào thật:
-- Automation: [ ] augment [ ] conditional [ ] automate — lý do theo cost-of-error:
-- §4b. Nguyên tắc đã áp dụng (≥4 — HAX/PAIR, xem guide):
-  | Nguyên tắc | Áp cụ thể vào đâu trong prototype |
-  |---|---|
+- **Lát cắt MỘT CÂU:** Một người viết kịch bản · nhập chủ đề + chọn transcript/slide nguồn · AI trích nội dung liên quan và draft kịch bản kèm mã trích dẫn [Txx-NNN] · người viết duyệt/sửa/chấp nhận từng đoạn.
+- **Non-goals:**
+  1. KHÔNG build video editor / TTS preview
+  2. KHÔNG tự xuất bản kịch bản chưa duyệt
+  3. KHÔNG hỗ trợ ngôn ngữ ngoài tiếng Việt
+  4. KHÔNG thay thế biên tập viên — AI chỉ draft, người duyệt
+- **Mức prototype:** [x] Mock → Working. Mock: UI 5 bước bấm được (CP2). Thật: RAG pipeline gọi AI thật với transcript (CP3).
+- **Automation:** [x] Conditional
+  - Lý do: Kịch bản sai nội dung → video sai → học viên học sai kiến thức → cost-of-error CAO
+  - Nên: AI tự draft khi có nguồn chắc chắn (CITED); gắn cờ "cần xác minh" khi mơ hồ (NEEDS_VERIFY); **từ chối sinh** khi không tìm thấy nguồn (NO_SOURCE) thay vì bịa
 
-## §5. Kiểu lỗi — 4 lớp chỗ khó + kịch bản (≥8) [bảng theo guide §2.5]
+### §4b. Nguyên tắc HAX/PAIR đã áp dụng (4 nguyên tắc)
+
+| Nguyên tắc | Áp cụ thể vào đâu trong prototype |
+|---|---|
+| **G1 — Làm rõ hệ thống làm được gì** | Bước 1: Banner "ScriptForge chỉ draft kịch bản từ tài liệu bạn chọn — không tự bịa thông tin ngoài nguồn" |
+| **G2 — Làm rõ nó làm tốt đến đâu** | Bước 2: Ghi rõ "AI chỉ trích dẫn từ các nguồn bạn chọn"; Bước 4: Mỗi đoạn gắn trạng thái CITED / NEEDS_VERIFY / NO_SOURCE |
+| **G10 — Thu hẹp phạm vi khi nghi ngờ** | Bước 4 (NEEDS_VERIFY): Banner "Nguồn tìm được có liên quan nhưng không đề cập trực tiếp — cần người xác minh". Bước 4 (NO_SOURCE): Từ chối sinh, gợi ý thêm nguồn hoặc tự viết |
+| **G9 — Sửa dễ dàng** | Bước 4: Mỗi đoạn có 3 nút [✓ Chấp nhận] [✏ Sửa] [✗ Bỏ], user sửa trực tiếp trên output |
+
+## §5. Kiểu lỗi — 4 lớp chỗ khó + kịch bản
+
+| Lớp | Chỗ khó | Kịch bản (≥2/lớp) |
+|---|---|---|
+| ① Nguồn sự thật | AI bịa nội dung không có trong transcript/slide | KB1: Hỏi chủ đề ngoài transcript → AI phải nói "không tìm thấy nguồn" thay vì bịa · KB2: 2 transcript nói trái ngược → AI trích cả 2 kèm cảnh báo |
+| ② Mơ hồ / thiếu thông tin | Chủ đề quá rộng hoặc từ khoá có nhiều nghĩa | KB3: Nhập "attention" (có thể là cơ chế ML hoặc tâm lý học) → AI hỏi lại hoặc gắn NEEDS_VERIFY · KB4: Transcript đề cập khái niệm nhưng không giải thích sâu → gắn NEEDS_VERIFY |
+| ③ Ngoài phạm vi | User đòi sinh nội dung mà hệ thống không được phép | KB5: Yêu cầu viết kịch bản từ nguồn ngoài (Wikipedia, paper) → từ chối, gợi ý thêm nguồn vào hệ thống · KB6: Yêu cầu tự động publish → từ chối, chỉ cho xuất bản nháp |
+| ④ Đặc thù domain | Kiến thức chuyên ngành sai → học viên học sai | KB7: Dịch sai thuật ngữ (ví dụ "gradient" → "độ dốc" vs "gradient") → trích nguyên văn nguồn kèm thuật ngữ gốc · KB8: Công thức toán bị sai khi paraphrase → trích nguyên bản + gắn NEEDS_VERIFY |
 
 ## §6. Bốn đường đi của trải nghiệm
-- Happy path: · Low-confidence (②): · Failure/không căn cứ (①): · Correction (user sửa):
-- Khi bị đòi ngoài phạm vi (③): · Case đặc thù domain (④):
+
+- **Happy path (CITED):** User nhập chủ đề → chọn transcript → AI tìm đoạn liên quan → draft kịch bản kèm cite [T06-042] → user bấm cite xem nguồn gốc → chấp nhận → xuất kịch bản hoàn chỉnh
+- **Low-confidence (NEEDS_VERIFY):** AI tìm được nguồn liên quan nhưng không khớp trực tiếp → gắn 🟡 NEEDS_VERIFY + banner "cần người xác minh" → user bấm cite kiểm tra nguồn → chấp nhận / sửa / bỏ
+- **Failure / không căn cứ (NO_SOURCE):** AI không tìm thấy nguồn trong tài liệu đã chọn → gắn 🔴 NO_SOURCE → **không sinh nội dung** → gợi ý: thêm nguồn / tự viết / bỏ qua
+- **Correction (user sửa):** User bấm [✏ Sửa] → chỉnh trực tiếp trên output → giữ lại trích dẫn hoặc xoá
+- **Ngoài phạm vi (③):** User yêu cầu nguồn ngoài hệ thống → từ chối + gợi ý "vui lòng thêm nguồn vào bước 2"
+- **Case đặc thù domain (④):** Thuật ngữ chuyên ngành → giữ nguyên bản gốc, không tự ý paraphrase; công thức → trích nguyên bản + NEEDS_VERIFY
 
 ## §7. Kiểm thử
-- Chiều chất lượng + định nghĩa kiểm chứng được:
-- Golden set (≥20 case theo cơ cấu trong guide §2.6, file trong eval/):
-- Quality bar (chốt từ hạn chốt spec của khoá, giữ nguyên sau đó): "Đạt khi ≥ ___% qua bộ, và ___"
-- Kết quả các lượt chạy (bảng % — cập nhật đến trước CP6):
+- **Chiều chất lượng:** Citation accuracy (trích dẫn đúng đoạn nguồn) · Relevance (nội dung draft liên quan đến chủ đề) · Refusal rate (có từ chối đúng khi không có nguồn không)
+- **Golden set:** ≥20 case — file: `eval/golden-set.csv`
+  - 10 case CITED (có nguồn rõ)
+  - 5 case NEEDS_VERIFY (nguồn mơ hồ)
+  - 3 case NO_SOURCE (không có nguồn → phải từ chối)
+  - 2 case ngoài phạm vi (phải từ chối)
+- **Quality bar:** "Đạt khi ≥80% citation chính xác, 100% case NO_SOURCE được từ chối đúng, và ≥70% user chấp nhận draft không cần sửa lớn"
+- *(Kết quả chạy: cập nhật tại CP3-CP4)*
 
 ## §8. Phân công & kế hoạch
-- Phân công có tên: spec / evidence / prompt / code / demo
-- Willing users (≥2 tên) + kế hoạch vòng validation *(bonus, nếu làm)*:
-- Multi-prototype (nếu làm): trục khác biệt của ≥2 phương án + lý do chọn:
+
+| Vai trò | Người | Việc cụ thể |
+|---|---|---|
+| Spec + Evidence | Nguyễn Lê Phúc Thắng, Vũ Minh Hoàng | Viết spec, phỏng vấn Studio team, mining data |
+| Prototype | Lê Duy Quân, Bùi Trọng Trịnh | Code RAG pipeline + UI |
+| AI Call | Bùi Trọng Trịnh, Nguyễn Lê Phúc Thắng | Prompt engineering, citation format |
+| Eval | Lê Duy Quân, Nguyễn Lê Phúc Thắng | Golden set ≥20 case, chạy đo |
+| Validation/Demo | Vũ Minh Hoàng, Lê Duy Quân | User test, slide, video demo |
+
+- **Willing users:** Tai Thanh (Lab Coach), Mây (Lab Coach), Nguyễn Hồng Thái (Học viên), Võ Phú Hãn (Học viên)
 
 ## §9. Changelog
-| Thời điểm | Đổi gì | Vì sao (trỏ về feedback/case nào) |
-```
+| Thời điểm | Đổi gì | Vì sao |
+|---|---|---|
+| 16/9 19:30 | Tạo Canvas CP1, chọn Track C3 | Khảo sát ~20 người, >90% xác nhận cần công cụ tìm nguồn |
+| 16/9 20:00 | Mock prototype 5 bước + spec §4, §6 (CP2) | Thiết kế luồng trải nghiệm trước khi code |
+
