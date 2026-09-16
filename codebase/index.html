@@ -766,20 +766,24 @@
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
                     <div class="input-group">
                         <label class="input-label">Đối tượng người học</label>
-                        <select id="audienceSelect" style="width:100%;padding:12px 14px;background:var(--bg-primary);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text-primary);font-family:'Inter',sans-serif;font-size:14px;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url('data:image/svg+xml;utf8,<svg fill=\'%238b8fa3\' viewBox=\'0 0 24 24\' xmlns=\'http://www.w3.org/2000/svg\'><path d=\'M7 10l5 5 5-5z\'/></svg>');background-repeat:no-repeat;background-position:right 12px center;background-size:18px;">
+                        <select id="audienceSelect" onchange="toggleCustomInput('audienceSelect','audienceCustom')" style="width:100%;padding:12px 14px;background:var(--bg-primary);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text-primary);font-family:'Inter',sans-serif;font-size:14px;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url('data:image/svg+xml;utf8,<svg fill=\'%238b8fa3\' viewBox=\'0 0 24 24\' xmlns=\'http://www.w3.org/2000/svg\'><path d=\'M7 10l5 5 5-5z\'/></svg>');background-repeat:no-repeat;background-position:right 12px center;background-size:18px;">
                             <option value="beginner" selected>Người mới bắt đầu</option>
                             <option value="intermediate">Đã có kiến thức nền</option>
                             <option value="advanced">Nâng cao / chuyên sâu</option>
+                            <option value="custom">Khác (tự nhập)...</option>
                         </select>
+                        <input type="text" id="audienceCustom" placeholder="Ví dụ: Sinh viên năm 3 ngành CNTT" style="display:none;margin-top:8px;">
                     </div>
                     <div class="input-group">
                         <label class="input-label">Độ dài video dự kiến</label>
-                        <select id="durationSelect" style="width:100%;padding:12px 14px;background:var(--bg-primary);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text-primary);font-family:'Inter',sans-serif;font-size:14px;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url('data:image/svg+xml;utf8,<svg fill=\'%238b8fa3\' viewBox=\'0 0 24 24\' xmlns=\'http://www.w3.org/2000/svg\'><path d=\'M7 10l5 5 5-5z\'/></svg>');background-repeat:no-repeat;background-position:right 12px center;background-size:18px;">
+                        <select id="durationSelect" onchange="toggleCustomInput('durationSelect','durationCustom')" style="width:100%;padding:12px 14px;background:var(--bg-primary);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text-primary);font-family:'Inter',sans-serif;font-size:14px;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url('data:image/svg+xml;utf8,<svg fill=\'%238b8fa3\' viewBox=\'0 0 24 24\' xmlns=\'http://www.w3.org/2000/svg\'><path d=\'M7 10l5 5 5-5z\'/></svg>');background-repeat:no-repeat;background-position:right 12px center;background-size:18px;">
                             <option value="5">~5 phút (ngắn)</option>
                             <option value="10" selected>~10 phút (chuẩn)</option>
                             <option value="15">~15 phút (dài)</option>
                             <option value="20">~20 phút (chuyên sâu)</option>
+                            <option value="custom">Khác (tự nhập)...</option>
                         </select>
+                        <input type="text" id="durationCustom" placeholder="Ví dụ: 25 phút, chia 3 phần" style="display:none;margin-top:8px;">
                     </div>
                 </div>
                 <div class="input-group">
@@ -864,9 +868,23 @@
                 </div>
             </div>
 
+            <div class="card" style="border-style:dashed;">
+                <div class="card-label">➕ Thêm nguồn của bạn</div>
+                <div style="display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end;">
+                    <div>
+                        <input type="text" id="customSourceName" placeholder="Tên nguồn (VD: Bài báo Attention Is All You Need)" style="margin-bottom:8px;">
+                        <input type="text" id="customSourceDesc" placeholder="Mô tả ngắn (VD: Paper gốc · 2017 · 15 trang)">
+                    </div>
+                    <button class="btn btn-secondary" onclick="addCustomSource()" style="height:fit-content;white-space:nowrap;">
+                        + Thêm
+                    </button>
+                </div>
+                <div id="customSourceList" style="margin-top:10px;"></div>
+            </div>
+
             <div class="btn-row">
                 <button class="btn btn-secondary" onclick="goToScreen(1)">← Quay lại</button>
-                <button class="btn btn-primary" onclick="goToScreen(3)">Tiếp → Tạo kịch bản từ 3 nguồn đã chọn</button>
+                <button class="btn btn-primary" onclick="goToScreen(3)">Tiếp → Tạo kịch bản từ nguồn đã chọn</button>
             </div>
         </div>
 
@@ -1198,6 +1216,40 @@
                 b.classList.remove('accepted', 'rejected', 'editing');
             });
             group.closest('.segment').style.opacity = '1';
+        }
+
+        function addCustomSource() {
+            const name = document.getElementById('customSourceName').value.trim();
+            const desc = document.getElementById('customSourceDesc').value.trim();
+            if (!name) { document.getElementById('customSourceName').focus(); return; }
+
+            const list = document.getElementById('customSourceList');
+            const item = document.createElement('div');
+            item.className = 'source-option selected';
+            item.onclick = function() { toggleSource(this); };
+            item.innerHTML = `
+                <div class="source-check">✓</div>
+                <div style="flex:1">
+                    <div class="source-name">${name} <span style="color:var(--accent-light);font-size:11px;font-weight:700;">Người dùng thêm</span></div>
+                    <div class="source-desc">${desc || 'Nguồn tuỳ chỉnh'}</div>
+                </div>
+            `;
+            list.appendChild(item);
+
+            document.getElementById('customSourceName').value = '';
+            document.getElementById('customSourceDesc').value = '';
+        }
+
+        function toggleCustomInput(selectId, inputId) {
+            const sel = document.getElementById(selectId);
+            const inp = document.getElementById(inputId);
+            if (sel.value === 'custom') {
+                inp.style.display = 'block';
+                inp.focus();
+            } else {
+                inp.style.display = 'none';
+                inp.value = '';
+            }
         }
 
         // Sources are pre-selected by AI in HTML (selected class)
