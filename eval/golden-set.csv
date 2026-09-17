@@ -1,1 +1,25 @@
-case_id,category,input,expected_output,difficulty,source
+case_id,category,difficulty_class,input_topic,input_sources,expected_behavior,expected_status,source_type
+GS-01,common,happy_path,"Giải thích cơ chế Attention trong Transformer","Transcript-06, Slide Bài 3","Draft kịch bản giới thiệu Attention với trích dẫn [T06-042], [T06-051]",CITED,chatlog_derived
+GS-02,common,happy_path,"Self-Attention là gì, giải thích Q K V","Transcript-06","Trích dẫn đoạn giải thích Q K V từ Transcript-06 với mã [T06-051]",CITED,chatlog_derived
+GS-03,common,happy_path,"Ví dụ trực quan về Attention weight","Transcript-06","Dùng ví dụ 'con mèo ngồi trên thảm' từ nguồn [T06-058]",CITED,chatlog_derived
+GS-04,common,happy_path,"Giải thích Backpropagation","Transcript-03, Slide Bài 2","Draft kịch bản về backprop với trích dẫn từ nguồn đã chọn",CITED,chatlog_derived
+GS-05,common,happy_path,"Neural Network cơ bản — perceptron và layer","Transcript-03","Draft giải thích NN cơ bản kèm trích dẫn",CITED,chatlog_derived
+GS-06,common,happy_path,"Sequence-to-Sequence model là gì","Transcript-05","Trích dẫn đoạn giải thích seq2seq từ Transcript-05",CITED,chatlog_derived
+GS-07,common,happy_path,"Giải thích Gradient Descent","Transcript-03, Slide Bài 2","Draft kèm trích dẫn từ nguồn về gradient descent",CITED,chatlog_derived
+GS-08,common,happy_path,"RNN và vấn đề vanishing gradient","Transcript-05","Trích dẫn đoạn về RNN limitations từ Transcript-05",CITED,chatlog_derived
+GS-09,common,happy_path,"Loss function trong Deep Learning","Transcript-03, Slide Bài 2","Draft kèm trích dẫn, giải thích loss function",CITED,synthetic
+GS-10,common,happy_path,"Positional Encoding trong Transformer","Transcript-06, Slide Bài 3","Draft kèm trích dẫn về positional encoding",CITED,chatlog_derived
+GS-11,class_1,source_of_truth,"Giải thích Quantum Computing cho AI","Transcript-06","Từ chối sinh nội dung — không có nguồn về quantum computing trong transcript",NO_SOURCE,synthetic
+GS-12,class_1,source_of_truth,"Reinforcement Learning — policy gradient","Transcript-03, Transcript-05","Từ chối hoặc gắn NO_SOURCE — không có nội dung RL trong các transcript đã chọn",NO_SOURCE,synthetic
+GS-13,class_1,source_of_truth,"2 transcript nói trái ngược về learning rate","Transcript-03, Transcript-05","AI trích cả 2 nguồn kèm cảnh báo sự khác biệt, gắn NEEDS_VERIFY",NEEDS_VERIFY,chatlog_derived
+GS-14,class_2,ambiguous,"Giải thích 'attention' (có thể là cơ chế ML hoặc tâm lý học)","Transcript-06","AI hỏi lại hoặc gắn NEEDS_VERIFY vì từ khóa mơ hồ",NEEDS_VERIFY,chatlog_derived
+GS-15,class_2,ambiguous,"Chủ đề quá rộng: 'Deep Learning'","Transcript-03, Transcript-05, Transcript-06","AI gợi ý thu hẹp phạm vi hoặc draft kèm NEEDS_VERIFY cho các phần suy luận thêm",NEEDS_VERIFY,synthetic
+GS-16,class_2,ambiguous,"Transcript đề cập 'regularization' nhưng không giải thích sâu","Transcript-03","Gắn NEEDS_VERIFY cho phần AI phải bổ sung giải thích ngoài nguồn",NEEDS_VERIFY,chatlog_derived
+GS-17,class_3,out_of_scope,"Viết kịch bản từ Wikipedia về Transformer","Không chọn nguồn nội bộ","Từ chối — chỉ hỗ trợ nguồn nội bộ đã upload, gợi ý thêm nguồn vào bước 2",NO_SOURCE,synthetic
+GS-18,class_3,out_of_scope,"Yêu cầu tự động publish kịch bản lên YouTube","Transcript-06","Từ chối — ngoài phạm vi, chỉ xuất bản nháp để người duyệt",NO_SOURCE,synthetic
+GS-19,class_4,domain_specific,"Dịch thuật ngữ 'gradient' — 'độ dốc' hay giữ nguyên","Transcript-03","Giữ nguyên thuật ngữ gốc 'gradient' kèm trích dẫn nguyên văn từ nguồn",CITED,chatlog_derived
+GS-20,class_4,domain_specific,"Công thức Softmax(QK^T/√dk)V bị sai khi paraphrase","Slide Bài 3","Trích nguyên bản công thức từ slide, không paraphrase, gắn NEEDS_VERIFY nếu cần diễn giải",CITED,chatlog_derived
+GS-21,edge_case,rare,"Nhập chủ đề bằng tiếng Anh: 'Explain transformer architecture'","Transcript-06","Xử lý bình thường hoặc gợi ý nhập tiếng Việt (non-goal: không hỗ trợ ngoài tiếng Việt)",NEEDS_VERIFY,synthetic
+GS-22,edge_case,rare,"Nhập chủ đề trống / chỉ có dấu cách","Không","Báo lỗi yêu cầu nhập chủ đề hợp lệ",NO_SOURCE,synthetic
+GS-23,edge_case,rare,"Chọn nguồn nhưng nguồn không chứa text (file trống)","Transcript rỗng","Thông báo nguồn không có nội dung, gợi ý chọn nguồn khác",NO_SOURCE,synthetic
+GS-24,class_4,domain_specific,"Giải thích Multi-Head Attention — phần AI suy luận thêm","Transcript-06","Draft kèm NEEDS_VERIFY cho phần AI suy luận ngoài nguồn (ví dụ cú pháp/ngữ nghĩa)",NEEDS_VERIFY,chatlog_derived

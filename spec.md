@@ -93,4 +93,4 @@ Loại: [x] Tính năng mới
 |---|---|---|
 | 16/9 19:30 | Tạo Canvas CP1, chọn Track C3 | Khảo sát ~20 người, >90% xác nhận cần công cụ tìm nguồn |
 | 16/9 20:00 | Mock prototype 5 bước + spec §4, §6 (CP2) | Thiết kế luồng trải nghiệm trước khi code |
-
+

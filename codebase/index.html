@@ -5,62 +5,182 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ScriptForge — AI Research-to-Script · Track C3</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
-        rel="stylesheet">
+    <meta name="description" content="ScriptForge biến tài liệu nghiên cứu thành kịch bản video giáo dục có trích dẫn nguồn, powered by AI.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
+        /* ==================== LIGHT PREMIUM DESIGN ==================== */
         :root {
-            --bg-primary: #0f1117;
-            --bg-secondary: #1a1d28;
-            --bg-card: #21242f;
-            --bg-hover: #282c3a;
-            --border: #2d3348;
-            --text-primary: #e8eaf0;
-            --text-secondary: #8b8fa3;
-            --text-muted: #5a5f73;
-            --accent: #6c5ce7;
-            --accent-light: #a29bfe;
-            --accent-glow: rgba(108, 92, 231, 0.15);
-            --green: #00b894;
-            --green-bg: rgba(0, 184, 148, 0.1);
-            --green-border: rgba(0, 184, 148, 0.3);
-            --yellow: #fdcb6e;
-            --yellow-bg: rgba(253, 203, 110, 0.1);
-            --yellow-border: rgba(253, 203, 110, 0.3);
-            --red: #e17055;
-            --red-bg: rgba(225, 112, 85, 0.1);
-            --red-border: rgba(225, 112, 85, 0.3);
-            --blue: #74b9ff;
-            --radius: 12px;
-            --radius-sm: 8px;
-            --shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+            --white: #ffffff;
+            --bg: #f8f9fc;
+            --bg-subtle: #f0f2f7;
+            --bg-card: #ffffff;
+            --bg-hover: #fafafd;
+            --border: #e2e5ef;
+            --border-light: #eff1f6;
+            --border-hover: #d0d4e2;
+            --text: #1a1c2e;
+            --text-secondary: #5c617a;
+            --text-muted: #9ca0b4;
+            --accent: #6c3dfc;
+            --accent-light: #8b6aff;
+            --accent-bg: rgba(108, 61, 252, 0.06);
+            --accent-border: rgba(108, 61, 252, 0.15);
+            --accent-strong: rgba(108, 61, 252, 0.12);
+            --green: #059669;
+            --green-light: #10b981;
+            --green-bg: #ecfdf5;
+            --green-border: #a7f3d0;
+            --yellow: #d97706;
+            --yellow-bg: #fffbeb;
+            --yellow-border: #fde68a;
+            --red: #dc2626;
+            --red-bg: #fef2f2;
+            --red-border: #fecaca;
+            --blue: #2563eb;
+            --gradient-primary: linear-gradient(135deg, #6c3dfc 0%, #8b6aff 50%, #a78bfa 100%);
+            --gradient-hero: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-mesh: linear-gradient(135deg, rgba(108, 61, 252, 0.05) 0%, rgba(99, 102, 241, 0.03) 50%, rgba(16, 185, 129, 0.03) 100%);
+            --shadow-xs: 0 1px 2px rgba(0,0,0,0.04);
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.06);
+            --shadow-md: 0 4px 16px rgba(0,0,0,0.08);
+            --shadow-lg: 0 12px 40px rgba(0,0,0,0.1);
+            --shadow-accent: 0 8px 32px rgba(108, 61, 252, 0.18);
+            --radius: 16px;
+            --radius-sm: 10px;
+            --radius-xs: 6px;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: 'Inter', sans-serif;
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            min-height: 100vh;
-            overflow-x: hidden;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            height: 100vh;
+            overflow: hidden;
+            -webkit-font-smoothing: antialiased;
         }
 
-        /* Header */
+        /* ==================== HERO MESH BG ==================== */
+        .hero-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .hero-bg .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.6;
+            animation: orbFloat 25s ease-in-out infinite;
+        }
+
+        .hero-bg .orb:nth-child(1) {
+            width: 700px; height: 700px;
+            background: rgba(108, 61, 252, 0.08);
+            top: -20%; left: -10%;
+        }
+
+        .hero-bg .orb:nth-child(2) {
+            width: 500px; height: 500px;
+            background: rgba(99, 102, 241, 0.06);
+            top: 30%; right: -15%;
+            animation-delay: -8s;
+            animation-duration: 30s;
+        }
+
+        .hero-bg .orb:nth-child(3) {
+            width: 400px; height: 400px;
+            background: rgba(16, 185, 129, 0.05);
+            bottom: -10%; left: 30%;
+            animation-delay: -16s;
+            animation-duration: 35s;
+        }
+
+        @keyframes orbFloat {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(50px, -30px) scale(1.05); }
+            66% { transform: translate(-30px, 40px) scale(0.98); }
+        }
+
+        /* Dot pattern overlay */
+        .hero-bg::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: radial-gradient(circle, rgba(0,0,0,0.03) 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+
+        /* ==================== HEADER ==================== */
         .header {
-            background: var(--bg-secondary);
-            border-bottom: 1px solid var(--border);
-            padding: 16px 32px;
+            background: #eef3f8;
+            border-bottom: 1.5px solid #cbd5e1;
+            padding: 0 28px;
+            height: 60px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             position: sticky;
             top: 0;
             z-index: 100;
-            backdrop-filter: blur(12px);
+            box-shadow: 0 1px 6px rgba(15, 23, 42, 0.06);
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #6c3dfc 0%, #8b5cf6 40%, #3b82f6 80%, #06b6d4 100%);
+        }
+
+        .header-test-btn {
+            font-size: 12px;
+            font-weight: 600;
+            padding: 6px 14px;
+            border-radius: 100px;
+            white-space: nowrap;
+            background: #ffffff;
+            border: 1.5px solid #cbd5e1;
+            color: #334155;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            font-family: inherit;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+        }
+
+        .header-test-btn:hover {
+            border-color: #6c3dfc;
+            color: #6c3dfc;
+            background: #f8f6ff;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(108, 61, 252, 0.15);
+        }
+
+        .header-test-btn:active {
+            transform: translateY(0);
+        }
+
+        .header-test-btn.testing {
+            pointer-events: none;
+            opacity: 0.75;
+        }
+
+        .header-test-btn.testing .test-icon {
+            display: inline-block;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
         }
 
         .logo {
@@ -70,204 +190,304 @@
         }
 
         .logo-icon {
-            width: 36px;
-            height: 36px;
-            background: linear-gradient(135deg, var(--accent), var(--accent-light));
+            width: 36px; height: 36px;
+            background: linear-gradient(135deg, #6c3dfc, #4f46e5);
             border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 13px; font-weight: 900; color: #fff;
+            letter-spacing: -0.5px;
+            box-shadow: 0 4px 12px rgba(108, 61, 252, 0.28);
+        }
+
+        .logo-details {
             display: flex;
             align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            font-weight: 800;
-            color: #fff;
+            gap: 8px;
         }
 
         .logo-text {
-            font-size: 20px;
+            font-size: 19px; font-weight: 800;
+            letter-spacing: -0.6px;
+            color: #0f172a;
+        }
+
+        .logo-badge {
+            font-size: 10px;
             font-weight: 700;
-            background: linear-gradient(135deg, var(--accent-light), var(--blue));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: #6c3dfc;
+            background: #f3f0ff;
+            padding: 2px 8px;
+            border-radius: 100px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            border: 1px solid #ddd6fe;
+        }
+
+        .header-right {
+            display: flex; align-items: center; gap: 10px;
         }
 
         .header-badge {
             font-size: 11px;
-            color: var(--text-muted);
-            background: var(--bg-card);
-            padding: 4px 10px;
-            border-radius: 20px;
-            border: 1px solid var(--border);
+            color: #475569;
+            background: #ffffff;
+            padding: 6px 14px;
+            border-radius: 100px;
+            border: 1.5px solid #cbd5e1;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.03);
         }
 
-        /* Steps Progress */
+        .header-user-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 12px;
+            background: #ffffff;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 100px;
+            font-size: 12px;
+            color: #1e293b;
+            font-weight: 600;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+        }
+
+        .header-user-avatar {
+            width: 20px; height: 20px;
+            background: linear-gradient(135deg, #e0e7ff, #c7d2fe);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 10px;
+        }
+
+        .api-status {
+            font-size: 11.5px; font-weight: 600;
+            padding: 6px 14px;
+            border-radius: 100px;
+            white-space: nowrap;
+            transition: all 0.3s;
+            background: #ffffff;
+            border: 1.5px solid #cbd5e1;
+            color: #475569;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+        }
+
+        .api-status.connected {
+            background: #ecfdf5;
+            color: #065f46;
+            border-color: #a7f3d0;
+            box-shadow: 0 1px 4px rgba(16, 185, 129, 0.12);
+        }
+
+        .api-status.disconnected {
+            background: #fef2f2;
+            color: #b91c1c;
+            border-color: #fecaca;
+        }
+
+        /* ==================== STEPS ==================== */
         .steps-bar {
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 0;
-            padding: 24px 32px 8px;
+            padding: 12px 24px 8px;
+            position: relative;
+            z-index: 1;
+            flex-shrink: 0;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
         }
 
-        .step-item {
-            display: flex;
-            align-items: center;
-            gap: 0;
+        .step-wrapper {
+            display: flex; flex-direction: column; align-items: center;
         }
 
         .step-circle {
-            width: 36px;
-            height: 36px;
+            width: 32px; height: 32px;
             border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 13px;
-            font-weight: 700;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 12px; font-weight: 700;
             border: 2px solid var(--border);
             color: var(--text-muted);
-            background: var(--bg-secondary);
-            transition: all 0.4s ease;
+            background: var(--white);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             cursor: pointer;
+            box-shadow: var(--shadow-xs);
         }
 
         .step-circle.active {
             border-color: var(--accent);
             background: var(--accent);
             color: #fff;
-            box-shadow: 0 0 20px var(--accent-glow);
+            box-shadow: 0 0 0 3px var(--accent-bg), var(--shadow-accent);
+            transform: scale(1.06);
         }
 
         .step-circle.done {
-            border-color: var(--green);
-            background: var(--green);
+            border-color: var(--green-light);
+            background: var(--green-light);
             color: #fff;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
         }
 
+        .step-circle.done::after { content: '✓'; font-size: 13px; }
+
         .step-line {
-            width: 60px;
-            height: 2px;
+            width: 44px; height: 2px;
             background: var(--border);
-            transition: background 0.4s ease;
+            transition: all 0.4s;
+            border-radius: 1px;
         }
 
         .step-line.done {
-            background: var(--green);
+            background: linear-gradient(90deg, var(--green-light), var(--accent));
         }
 
         .step-label {
-            font-size: 11px;
+            font-size: 10px;
             color: var(--text-muted);
             text-align: center;
-            margin-top: 6px;
-            max-width: 80px;
+            margin-top: 4px;
+            font-weight: 600;
         }
 
-        .step-wrapper {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        /* Main content */
+        /* ==================== MAIN ==================== */
         .main {
-            max-width: 900px;
+            max-width: 860px;
+            width: 100%;
             margin: 0 auto;
-            padding: 24px 32px 80px;
+            padding: 6px 28px 18px;
+            position: relative;
+            z-index: 1;
+            flex: 1;
         }
 
         .screen {
             display: none;
-            animation: fadeIn 0.4s ease;
+            animation: screenIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        .screen.active {
-            display: block;
-        }
+        .screen.active { display: block; }
 
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(12px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        @keyframes screenIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .screen-title {
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 6px;
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: -0.6px;
+            color: var(--text);
+            margin-bottom: 2px;
         }
 
         .screen-subtitle {
-            font-size: 14px;
+            font-size: 12.5px;
             color: var(--text-secondary);
-            margin-bottom: 24px;
-            line-height: 1.6;
+            margin-bottom: 12px;
+            line-height: 1.4;
         }
 
-        /* Cards */
+        /* ==================== CARDS ==================== */
         .card {
             background: var(--bg-card);
-            border: 1px solid var(--border);
+            border: 1px solid rgba(0, 0, 0, 0.08);
             border-radius: var(--radius);
-            padding: 24px;
-            margin-bottom: 16px;
-            transition: border-color 0.2s;
+            padding: 18px 22px;
+            margin-bottom: 12px;
+            box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.06), 0 2px 6px -1px rgba(15, 23, 42, 0.04);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
         }
 
         .card:hover {
-            border-color: var(--accent);
+            box-shadow: 0 8px 28px -4px rgba(15, 23, 42, 0.1);
+            border-color: rgba(108, 61, 252, 0.2);
+            transform: translateY(-1px);
         }
 
         .card-label {
-            font-size: 11px;
-            font-weight: 600;
+            font-size: 10px;
+            font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 2px;
             color: var(--text-muted);
-            margin-bottom: 8px;
+            margin-bottom: 10px;
         }
 
-        /* Inputs */
-        .input-group {
-            margin-bottom: 20px;
-        }
+        /* ==================== INPUTS ==================== */
+        .input-group { margin-bottom: 10px; }
 
         .input-label {
-            font-size: 13px;
-            font-weight: 600;
+            font-size: 11px;
+            font-weight: 700;
             color: var(--text-secondary);
-            margin-bottom: 8px;
+            margin-bottom: 4px;
             display: block;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
-        textarea,
-        input[type="text"] {
+        textarea, input[type="text"] {
             width: 100%;
-            padding: 14px 16px;
-            background: var(--bg-primary);
+            padding: 8px 12px;
+            background: var(--bg);
             border: 1px solid var(--border);
             border-radius: var(--radius-sm);
-            color: var(--text-primary);
+            color: var(--text);
             font-family: 'Inter', sans-serif;
-            font-size: 14px;
-            line-height: 1.6;
+            font-size: 13px;
+            line-height: 1.4;
             resize: vertical;
-            transition: border-color 0.2s;
+            transition: all 0.2s;
         }
 
-        textarea:focus,
-        input[type="text"]:focus {
+        textarea:focus, input[type="text"]:focus {
             outline: none;
             border-color: var(--accent);
-            box-shadow: 0 0 0 3px var(--accent-glow);
+            box-shadow: 0 0 0 3px var(--accent-bg);
+            background: var(--white);
         }
 
-        /* Source checkboxes */
+        textarea::placeholder, input[type="text"]::placeholder { color: var(--text-muted); }
+
+        select {
+            width: 100%;
+            padding: 8px 12px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            cursor: pointer;
+            appearance: none;
+            background-image: url('data:image/svg+xml;utf8,<svg fill="%239ca0b4" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 16px;
+            transition: all 0.2s;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-bg);
+        }
+
+        /* ==================== SOURCE GRID ==================== */
         .source-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -275,985 +495,1507 @@
         }
 
         .source-option {
-            background: var(--bg-primary);
-            border: 1px solid var(--border);
+            background: var(--white);
+            border: 1.5px solid var(--border);
             border-radius: var(--radius-sm);
-            padding: 14px 16px;
+            padding: 12px 16px;
             cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex; align-items: center; gap: 12px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.03);
         }
 
         .source-option:hover {
-            border-color: var(--accent-light);
+            border-color: var(--accent-border);
+            background: var(--accent-bg);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
         }
 
         .source-option.selected {
             border-color: var(--accent);
-            background: var(--accent-glow);
+            background: var(--accent-bg);
+            box-shadow: 0 0 0 1px var(--accent), var(--shadow-sm);
         }
 
         .source-check {
-            width: 20px;
-            height: 20px;
-            border-radius: 4px;
+            width: 24px; height: 24px;
+            border-radius: 7px;
             border: 2px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            display: flex; align-items: center; justify-content: center;
             font-size: 12px;
             color: transparent;
-            transition: all 0.2s;
+            transition: all 0.25s;
+            flex-shrink: 0;
+            background: var(--white);
         }
 
         .source-option.selected .source-check {
             background: var(--accent);
             border-color: var(--accent);
             color: #fff;
+            box-shadow: 0 2px 8px rgba(108, 61, 252, 0.25);
         }
 
-        .source-name {
-            font-size: 13px;
-            font-weight: 500;
-        }
+        .source-name { font-size: 14px; font-weight: 600; color: var(--text); }
+        .source-desc { font-size: 12px; color: var(--text-muted); margin-top: 3px; }
 
-        .source-desc {
-            font-size: 11px;
-            color: var(--text-muted);
-        }
-
-        /* Buttons */
+        /* ==================== BUTTONS ==================== */
         .btn {
-            padding: 12px 28px;
+            padding: 8px 18px;
             border-radius: var(--radius-sm);
-            font-family: 'Inter', sans-serif;
-            font-size: 14px;
-            font-weight: 600;
+            font-size: 12.5px;
+            font-weight: 700;
             cursor: pointer;
             border: none;
-            transition: all 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex; align-items: center; gap: 7px;
+            letter-spacing: 0.2px;
+            font-family: 'Inter', sans-serif;
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, var(--accent), #7c6cf0);
+            background: var(--gradient-primary);
             color: #fff;
-            box-shadow: 0 4px 16px rgba(108, 92, 231, 0.3);
+            box-shadow: var(--shadow-accent);
         }
 
         .btn-primary:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 6px 24px rgba(108, 92, 231, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(108, 61, 252, 0.25);
+            filter: brightness(1.05);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
         }
 
         .btn-secondary {
-            background: var(--bg-card);
+            background: var(--white);
             color: var(--text-secondary);
             border: 1px solid var(--border);
+            box-shadow: var(--shadow-xs);
         }
 
         .btn-secondary:hover {
-            border-color: var(--accent);
-            color: var(--text-primary);
+            border-color: var(--accent-border);
+            color: var(--accent);
+            background: var(--accent-bg);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-sm);
         }
 
         .btn-row {
-            display: flex;
-            gap: 12px;
+            display: flex; gap: 10px;
             justify-content: flex-end;
-            margin-top: 24px;
+            margin-top: 10px;
         }
 
-        /* Loading */
-        .loading-container {
-            text-align: center;
-            padding: 60px 0;
-        }
-
-        .spinner {
-            width: 48px;
-            height: 48px;
-            border: 3px solid var(--border);
-            border-top-color: var(--accent);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
-        }
-
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
-        .loading-text {
-            font-size: 14px;
-            color: var(--text-secondary);
-            animation: pulse 2s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-
-            0%,
-            100% {
-                opacity: 0.5;
-            }
-
-            50% {
-                opacity: 1;
-            }
-        }
-
-        /* Result segments */
-        .segment {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            margin-bottom: 12px;
-            overflow: hidden;
-            transition: all 0.2s;
-        }
-
-        .segment-header {
-            padding: 14px 18px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .segment-status {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-        }
-
-        .status-dot.cited {
-            background: var(--green);
-            box-shadow: 0 0 8px var(--green);
-        }
-
-        .status-dot.verify {
-            background: var(--yellow);
-            box-shadow: 0 0 8px var(--yellow);
-        }
-
-        .status-dot.nosource {
-            background: var(--red);
-            box-shadow: 0 0 8px var(--red);
-        }
-
-        .status-label {
-            font-size: 11px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .status-label.cited {
-            color: var(--green);
-        }
-
-        .status-label.verify {
-            color: var(--yellow);
-        }
-
-        .status-label.nosource {
-            color: var(--red);
-        }
-
-        .segment-body {
-            padding: 18px;
-        }
-
-        .segment-text {
-            font-size: 14px;
-            line-height: 1.8;
-            color: var(--text-primary);
-            margin-bottom: 10px;
-        }
-
-        .citation {
-            display: inline-block;
-            background: var(--accent-glow);
-            color: var(--accent-light);
-            font-size: 12px;
-            font-weight: 600;
-            padding: 2px 8px;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .citation:hover {
-            background: var(--accent);
-            color: #fff;
-        }
-
-        .segment-source {
-            font-size: 12px;
-            color: var(--text-muted);
-            background: var(--bg-primary);
-            padding: 10px 14px;
-            border-radius: var(--radius-sm);
-            margin-top: 8px;
-            border-left: 3px solid var(--accent);
-            display: none;
-        }
-
-        .segment-source.show {
-            display: block;
-        }
-
-        .segment-actions {
-            display: flex;
-            gap: 8px;
-            margin-top: 12px;
-        }
-
-        .seg-btn {
-            padding: 6px 14px;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            border: 1px solid var(--border);
-            background: var(--bg-primary);
-            color: var(--text-secondary);
-            transition: all 0.2s;
-            font-family: 'Inter', sans-serif;
-        }
-
-        .seg-btn:hover {
-            border-color: var(--accent);
-            color: var(--text-primary);
-        }
-
-        .seg-btn.accepted {
-            background: var(--green-bg);
-            border-color: var(--green-border);
-            color: var(--green);
-        }
-
-        .seg-btn.rejected {
-            background: var(--red-bg);
-            border-color: var(--red-border);
-            color: var(--red);
-        }
-
-        .seg-btn.editing {
-            background: var(--yellow-bg);
-            border-color: var(--yellow-border);
-            color: var(--yellow);
-        }
-
-        /* Warning banner */
+        /* ==================== BANNERS ==================== */
         .warning-banner {
             background: var(--yellow-bg);
             border: 1px solid var(--yellow-border);
             border-radius: var(--radius-sm);
-            padding: 12px 16px;
-            font-size: 13px;
+            padding: 8px 14px;
+            font-size: 12px;
             color: var(--yellow);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 16px;
+            margin-bottom: 10px;
+            line-height: 1.4;
         }
 
         .failure-banner {
             background: var(--red-bg);
             border: 1px solid var(--red-border);
             border-radius: var(--radius-sm);
-            padding: 12px 16px;
-            font-size: 13px;
+            padding: 10px 14px;
+            font-size: 12px;
             color: var(--red);
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+
+        /* ==================== LOADING ==================== */
+        .loading-container {
+            text-align: center;
+            padding: 72px 0;
+        }
+
+        .spinner {
+            width: 52px; height: 52px;
+            border: 3px solid var(--border-light);
+            border-top-color: var(--accent);
+            border-right-color: var(--accent-light);
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            margin: 0 auto 24px;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .loading-text {
+            font-size: 15px;
+            color: var(--text-secondary);
+            font-weight: 500;
+            animation: textPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes textPulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        /* ==================== SEGMENTS ==================== */
+        .segment {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            margin-bottom: 12px;
+            overflow: hidden;
+            transition: all 0.25s;
+            box-shadow: var(--shadow-xs);
+        }
+
+        .segment:hover {
+            box-shadow: var(--shadow-md);
+            border-color: var(--border-hover);
+            transform: translateY(-1px);
+        }
+
+        /* ==================== SLIDE BLUEPRINT STYLES ==================== */
+        .slide-header-bar {
+            padding: 14px 20px;
+            background: #f1f5f9;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .slide-title-wrap {
             display: flex;
             align-items: center;
             gap: 10px;
-            margin-bottom: 16px;
+            min-width: 0;
+            flex: 1;
         }
 
-        /* Stats bar */
-        .stats-bar {
+        .slide-number-badge {
+            background: linear-gradient(135deg, #6c3dfc, #4f46e5);
+            color: #ffffff;
+            font-size: 11px;
+            font-weight: 800;
+            padding: 3px 10px;
+            border-radius: 6px;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+            box-shadow: 0 2px 6px rgba(108, 61, 252, 0.25);
+        }
+
+        .slide-title-text {
+            font-size: 15px;
+            font-weight: 800;
+            color: #0f172a;
+            letter-spacing: -0.3px;
+        }
+
+        .slide-meta-box {
+            margin: 0 0 18px 0;
+            padding: 14px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+
+        @media (max-width: 900px) {
+            .slide-meta-box {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .slide-meta-item {
             display: flex;
-            gap: 16px;
-            margin-bottom: 20px;
+            flex-direction: column;
+            gap: 6px;
+            background: #ffffff;
+            padding: 12px 14px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+        }
+
+        .slide-meta-label {
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .slide-meta-label.purpose { color: #2563eb; }
+        .slide-meta-label.visual { color: #7c3aed; }
+        .slide-meta-label.takeaway { color: #059669; }
+
+        .slide-meta-value {
+            font-size: 12.5px;
+            color: #334155;
+            line-height: 1.55;
+            font-weight: 500;
+        }
+
+        .script-section-header {
+            font-size: 11.5px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: #64748b;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .segment-header {
+            padding: 16px 22px;
+            display: flex; align-items: center; justify-content: space-between;
+            border-bottom: 1px solid var(--border-light);
+            background: var(--bg);
+        }
+
+        .segment-status {
+            display: flex; align-items: center; gap: 10px;
+        }
+
+        .status-dot {
+            width: 10px; height: 10px;
+            border-radius: 50%;
+        }
+
+        .status-dot.cited { background: var(--green-light); box-shadow: 0 0 0 3px rgba(16,185,129,0.15); }
+        .status-dot.verify { background: var(--yellow); box-shadow: 0 0 0 3px rgba(217,119,6,0.15); }
+        .status-dot.nosource { background: var(--red); box-shadow: 0 0 0 3px rgba(220,38,38,0.15); }
+
+        .status-label {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .status-label.cited { color: var(--green); }
+        .status-label.verify { color: var(--yellow); }
+        .status-label.nosource { color: var(--red); }
+
+        .segment-body { padding: 22px; }
+
+        .segment-text {
+            font-size: 14.5px;
+            line-height: 1.9;
+            color: var(--text);
+            margin-bottom: 12px;
+        }
+
+        .segment-text.editable {
+            background: var(--yellow-bg);
+            padding: 16px;
+            border-radius: var(--radius-sm);
+            border: 1px dashed var(--yellow-border);
+            outline: none;
+        }
+
+        .citation {
+            display: inline-flex;
+            background: var(--accent-bg);
+            color: var(--accent);
+            font-size: 11px; font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+            padding: 3px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid var(--accent-border);
+        }
+
+        .citation:hover {
+            background: var(--accent);
+            color: #fff;
+            border-color: var(--accent);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(108, 61, 252, 0.25);
+        }
+
+        .segment-source {
+            font-size: 13px;
+            color: var(--text-secondary);
+            background: var(--bg);
+            padding: 14px 16px;
+            border-radius: var(--radius-sm);
+            margin-top: 10px;
+            border-left: 3px solid var(--accent);
+            display: none;
+            line-height: 1.6;
+        }
+
+        .segment-source.show {
+            display: block;
+            animation: fadeSlide 0.3s ease;
+        }
+
+        @keyframes fadeSlide {
+            from { opacity: 0; transform: translateY(-6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .segment-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+
+        .seg-btn {
+            padding: 8px 18px;
+            border-radius: 8px;
+            font-size: 12.5px;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            font-family: inherit;
+            letter-spacing: -0.2px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+        }
+
+        /* Accept Button: Crisp Green */
+        .seg-btn-accept {
+            background: #ecfdf5;
+            border: 1.5px solid #10b981;
+            color: #047857;
+        }
+        .seg-btn-accept:hover {
+            background: #10b981;
+            border-color: #059669;
+            color: #ffffff;
+            box-shadow: 0 4px 14px rgba(16, 185, 129, 0.28);
+            transform: translateY(-1px);
+        }
+        .seg-btn-accept.accepted {
+            background: #059669 !important;
+            border-color: #047857 !important;
+            color: #ffffff !important;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.25);
+        }
+
+        /* Edit Button: Crisp Blue */
+        .seg-btn-edit {
+            background: #eff6ff;
+            border: 1.5px solid #3b82f6;
+            color: #1d4ed8;
+        }
+        .seg-btn-edit:hover {
+            background: #3b82f6;
+            border-color: #2563eb;
+            color: #ffffff;
+            box-shadow: 0 4px 14px rgba(59, 130, 246, 0.28);
+            transform: translateY(-1px);
+        }
+        .seg-btn-edit.editing {
+            background: #2563eb !important;
+            border-color: #1d4ed8 !important;
+            color: #ffffff !important;
+        }
+
+        /* Reject Button: Crisp Rose/Red */
+        .seg-btn-reject {
+            background: #fef2f2;
+            border: 1.5px solid #ef4444;
+            color: #b91c1c;
+        }
+        .seg-btn-reject:hover {
+            background: #ef4444;
+            border-color: #dc2626;
+            color: #ffffff;
+            box-shadow: 0 4px 14px rgba(239, 68, 68, 0.28);
+            transform: translateY(-1px);
+        }
+        .seg-btn-reject.rejected {
+            background: #dc2626 !important;
+            border-color: #991b1b !important;
+            color: #ffffff !important;
+        }
+
+        /* Add Source Button: Crisp Violet */
+        .seg-btn-source {
+            background: #f5f3ff;
+            border: 1.5px solid #8b5cf6;
+            color: #6d28d9;
+        }
+        .seg-btn-source:hover {
+            background: #8b5cf6;
+            border-color: #7c3aed;
+            color: #ffffff;
+            box-shadow: 0 4px 14px rgba(139, 92, 246, 0.28);
+            transform: translateY(-1px);
+        }
+
+        /* ==================== STATS ==================== */
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+            margin-bottom: 24px;
         }
 
         .stat-item {
-            flex: 1;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
-            padding: 14px;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: var(--radius);
+            padding: 20px 16px;
             text-align: center;
+            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
         }
+
+        .stat-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(15, 23, 42, 0.07);
+        }
+
+        .stat-item:nth-child(1) { border-top: 3.5px solid #10b981; }
+        .stat-item:nth-child(2) { border-top: 3.5px solid #f59e0b; }
+        .stat-item:nth-child(3) { border-top: 3.5px solid #ef4444; }
 
         .stat-value {
-            font-size: 24px;
-            font-weight: 800;
+            font-size: 40px;
+            font-weight: 900;
+            letter-spacing: -2px;
+            line-height: 1;
         }
 
-        .stat-value.green {
-            color: var(--green);
-        }
-
-        .stat-value.yellow {
-            color: var(--yellow);
-        }
-
-        .stat-value.red {
-            color: var(--red);
-        }
+        .stat-value.green { color: var(--green); }
+        .stat-value.yellow { color: var(--yellow); }
+        .stat-value.red { color: var(--red); }
 
         .stat-label {
             font-size: 11px;
             color: var(--text-muted);
-            margin-top: 4px;
+            margin-top: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
-        /* Export screen */
+        /* ==================== EXPORT ==================== */
         .export-preview {
-            background: var(--bg-primary);
+            background: var(--bg);
             border: 1px solid var(--border);
             border-radius: var(--radius);
-            padding: 24px;
-            font-size: 14px;
+            padding: 32px;
+            font-size: 14.5px;
             line-height: 2;
             white-space: pre-line;
-            max-height: 300px;
+            max-height: 420px;
             overflow-y: auto;
         }
 
         .ref-list {
             margin-top: 16px;
-            padding: 16px;
+            padding: 22px;
             background: var(--bg-card);
             border-radius: var(--radius-sm);
             border: 1px solid var(--border);
+            box-shadow: var(--shadow-xs);
         }
 
         .ref-list h4 {
-            font-size: 13px;
-            color: var(--accent-light);
-            margin-bottom: 8px;
+            font-size: 12px; color: var(--accent);
+            margin-bottom: 12px; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 1px;
         }
 
-        .ref-item {
-            font-size: 12px;
-            color: var(--text-secondary);
-            margin-bottom: 4px;
-        }
+        .ref-item { font-size: 12px; color: var(--text-secondary); margin-bottom: 6px; padding: 4px 0; line-height: 1.5; }
+        .ref-item.warning { color: var(--yellow); }
 
-        /* G-principle tag */
+        /* ==================== G-TAG ==================== */
         .g-tag {
-            display: inline-block;
-            font-size: 10px;
-            font-weight: 700;
-            padding: 2px 6px;
+            display: inline-flex;
+            font-size: 9px; font-weight: 800;
+            padding: 3px 9px;
             border-radius: 4px;
-            background: rgba(116, 185, 255, 0.15);
+            background: rgba(37, 99, 235, 0.06);
             color: var(--blue);
             margin-left: 8px;
-            vertical-align: middle;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            border: 1px solid rgba(37, 99, 235, 0.1);
         }
 
-        /* Tooltip */
-        .info-tip {
+        /* ==================== LOG PANEL ==================== */
+        .log-panel {
+            background: #1a1c2e;
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: var(--radius-sm);
+            margin-top: 16px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: #10b981;
+            padding: 20px;
+            line-height: 1.8;
+        }
+
+        .log-entry {
+            margin-bottom: 4px; padding: 3px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+        }
+
+        .log-timestamp { color: #555a6e; }
+        .log-label { color: #a78bfa; font-weight: 600; }
+        .log-error { color: #ef4444; font-weight: 600; }
+
+        /* ==================== SCROLLBAR ==================== */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.08); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.15); }
+
+        /* ==================== APP LAYOUT ==================== */
+        .app-layout {
+            display: flex;
+            height: calc(100vh - 56px);
+            overflow: hidden;
             position: relative;
-            display: inline-block;
-            cursor: help;
+            z-index: 1;
         }
 
-        .info-tip .tip-text {
-            display: none;
+        .main-area {
+            flex: 1;
+            min-width: 0;
+            height: 100%;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            background: #f8fafc;
+        }
+
+        /* ==================== SIDEBAR (NAVBAR) ==================== */
+        .sidebar {
+            width: 310px;
+            min-width: 310px;
+            background: #eaeff5;
+            border-right: 1.5px solid #cbd5e1;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .sidebar-top-section {
+            padding: 14px 14px 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            border-bottom: 1.5px solid #cbd5e1;
+            background: #dfe6f0;
+        }
+
+        .sidebar-new-btn {
+            width: 100%;
+            padding: 11px 16px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #6c3dfc 0%, #4f46e5 100%);
+            color: #ffffff;
+            border: none;
+            font-family: inherit;
+            font-size: 13.5px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 4px 14px rgba(108, 61, 252, 0.28);
+            transition: all 0.25s;
+        }
+        .sidebar-new-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(108, 61, 252, 0.4);
+            filter: brightness(1.04);
+        }
+
+        .sidebar-search-wrap {
+            position: relative;
+            width: 100%;
+        }
+
+        .sidebar-search-wrap .search-icon {
             position: absolute;
-            bottom: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 10px 14px;
-            font-size: 12px;
-            color: var(--text-secondary);
-            width: 240px;
-            z-index: 10;
-            box-shadow: var(--shadow);
-            margin-bottom: 8px;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 14px;
+            color: #64748b;
+            pointer-events: none;
+            z-index: 2;
+            line-height: 1;
         }
 
-        .info-tip:hover .tip-text {
-            display: block;
+        input[type="text"].sidebar-search-input {
+            width: 100%;
+            padding: 9px 14px 9px 38px !important;
+            border-radius: 8px;
+            border: 1.5px solid #cbd5e1;
+            background: #ffffff;
+            font-size: 12.5px;
+            color: #1e293b;
+            outline: none;
+            font-family: inherit;
+            transition: all 0.2s;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+        }
+        input[type="text"].sidebar-search-input:focus {
+            border-color: #7c3aed;
+            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15);
+        }
+        input[type="text"].sidebar-search-input::placeholder {
+            color: #94a3b8;
+        }
+
+        .sidebar-meta-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 16px 6px;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            color: #475569;
+            text-transform: uppercase;
+        }
+
+        .sidebar-count-badge {
+            background: #ede9fe;
+            color: #6d28d9;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 100px;
+            border: 1px solid #ddd6fe;
+        }
+
+        .sidebar-scroll-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 6px 0;
+        }
+        .sidebar-scroll-area::-webkit-scrollbar { width: 5px; }
+        .sidebar-scroll-area::-webkit-scrollbar-track { background: transparent; }
+        .sidebar-scroll-area::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .sidebar-scroll-area::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        .sidebar-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .history-item {
+            margin: 8px 12px;
+            padding: 12px 14px;
+            background: #ffffff;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 10px;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04);
+        }
+
+        .history-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 8px;
+            bottom: 8px;
+            width: 3.5px;
+            border-radius: 0 4px 4px 0;
+            background: transparent;
+            transition: background 0.2s, box-shadow 0.2s;
+        }
+
+        .history-item:hover {
+            border-color: #94a3b8;
+            background: #ffffff;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+        }
+
+        .history-item.active {
+            background: #f5f3ff;
+            border-color: #8b5cf6;
+            box-shadow: 0 3px 12px rgba(108, 61, 252, 0.12);
+        }
+        .history-item.active::before {
+            background: #6c3dfc;
+            box-shadow: 0 0 8px rgba(108, 61, 252, 0.6);
+        }
+
+        .history-item-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+
+        .history-title-wrap {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            min-width: 0;
+            flex: 1;
+        }
+
+        .history-icon {
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .history-topic {
+            font-size: 13px;
+            font-weight: 700;
+            color: #1e293b;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .history-item.active .history-topic {
+            color: #4f46e5;
+        }
+
+        .history-trash-btn {
+            width: 26px;
+            height: 26px;
+            min-width: 26px;
+            border-radius: 6px;
+            border: 1px solid #cbd5e1;
+            background: #f8fafc;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s;
+            padding: 0;
+            line-height: 1;
+        }
+        .history-trash-btn:hover {
+            background: #fee2e2;
+            border-color: #fca5a5;
+            color: #dc2626;
+            transform: scale(1.08);
+        }
+
+        .history-meta {
+            font-size: 11px;
+            color: #64748b;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .history-meta .meta-dot {
+            color: #cbd5e1;
+        }
+
+        .history-stats {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+
+        .history-stat {
+            font-size: 10.5px;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 5px;
+            letter-spacing: -0.2px;
+        }
+        .history-stat.cited {
+            background: #ecfdf5;
+            color: #047857;
+            border: 1px solid #a7f3d0;
+        }
+        .history-stat.verify {
+            background: #fffbeb;
+            color: #b45309;
+            border: 1px solid #fde68a;
+        }
+        .history-stat.nosource {
+            background: #fef2f2;
+            color: #b91c1c;
+            border: 1px solid #fecaca;
+        }
+
+        .sidebar-empty {
+            padding: 36px 20px;
+            text-align: center;
+            color: #64748b;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+        .sidebar-empty-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+            opacity: 0.6;
+        }
+
+        .sidebar-footer {
+            padding: 12px 14px;
+            background: #dfe6f0;
+            border-top: 1.5px solid #cbd5e1;
+        }
+
+        .sidebar-footer-card {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 10px;
+            background: #ffffff;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+        }
+
+        .footer-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            background: linear-gradient(135deg, #6c3dfc, #4f46e5);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            flex-shrink: 0;
+        }
+
+        .footer-details {
+            min-width: 0;
+        }
+
+        .footer-name {
+            font-size: 12px;
+            font-weight: 700;
+            color: #0f172a;
+            line-height: 1.2;
+        }
+
+        .footer-desc {
+            font-size: 10.5px;
+            color: #64748b;
+        }
+
+        .sidebar-toggle {
+            position: fixed; bottom: 24px; left: 24px;
+            width: 52px; height: 52px; border-radius: 50%;
+            background: var(--gradient-primary); color: white;
+            border: none; font-size: 22px; cursor: pointer;
+            box-shadow: var(--shadow-accent); z-index: 200;
+            display: none; align-items: center; justify-content: center;
+            transition: all 0.25s;
+        }
+        .sidebar-toggle:hover { transform: translateY(-3px); box-shadow: 0 12px 40px rgba(108,61,252,0.3); }
+
+        .sidebar-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.3); z-index: 149;
+        }
+        .sidebar-overlay.open { display: block; }
+
+        /* ==================== RESPONSIVE ==================== */
+        @media (max-width: 1100px) {
+            .sidebar {
+                position: fixed; left: 0; top: 56px; height: calc(100vh - 56px); z-index: 150;
+                box-shadow: var(--shadow-lg); transform: translateX(-100%);
+            }
+            .sidebar.open { transform: translateX(0); }
+            .sidebar-toggle { display: flex; }
+        }
+
+        @media (max-width: 768px) {
+            .header { padding: 0 16px; }
+            .main { padding: 8px 16px 20px; }
+            .source-grid { grid-template-columns: 1fr; }
+            .btn-row { flex-direction: column-reverse; }
+            .btn { width: 100%; justify-content: center; }
+            .step-line { width: 28px; }
+            .screen-title { font-size: 20px; }
+            .header-badge { display: none; }
+            .header-test-btn .test-text { display: none; }
         }
     </style>
 </head>
 
 <body>
+    <!-- Animated Background -->
+    <div class="hero-bg">
+        <div class="orb"></div>
+        <div class="orb"></div>
+        <div class="orb"></div>
+    </div>
+
+    <!-- Header -->
     <!-- Header -->
     <header class="header">
         <div class="logo">
             <div class="logo-icon">SF</div>
-            <span class="logo-text">ScriptForge</span>
+            <div class="logo-details">
+                <span class="logo-text">ScriptForge</span>
+                <span class="logo-badge">STUDIO PRO</span>
+            </div>
         </div>
-        <span class="header-badge">Track C3 · Research-to-Script · Mock Prototype</span>
+        <div class="header-right">
+            <span class="api-status" id="apiStatus">⏳ Chưa kết nối</span>
+            <button class="header-test-btn" id="btnTestConn" onclick="testConnection()" title="Kiểm tra lại kết nối backend">
+                <span class="test-icon">⚡</span>
+                <span class="test-text">Kiểm tra kết nối</span>
+            </button>
+            <span class="header-badge">🎯 Track C3 · Research-to-Script</span>
+            <div class="header-user-chip">
+                <span class="header-user-avatar">👤</span>
+                <span>Workspace</span>
+            </div>
+        </div>
     </header>
 
-    <!-- Steps Progress -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+    <div class="app-layout">
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-top-section">
+            <button class="sidebar-new-btn" onclick="startNewScript()">➕ Tạo kịch bản mới</button>
+            <div class="sidebar-search-wrap">
+                <span class="search-icon">🔍</span>
+                <input type="text" class="sidebar-search-input" id="sidebarSearch" placeholder="Tìm kịch bản..." oninput="filterHistory(this.value)">
+            </div>
+        </div>
+        <div class="sidebar-meta-bar">
+            <span>📁 KỊCH BẢN ĐÃ LƯU</span>
+            <span class="sidebar-count-badge" id="historyCount">0</span>
+        </div>
+        <div class="sidebar-scroll-area">
+            <div class="sidebar-empty" id="sidebarEmpty">
+                <div class="sidebar-empty-icon">📝</div>
+                Chưa có kịch bản nào.<br>Tạo mới để lưu ở đây.
+            </div>
+            <ul class="sidebar-list" id="historyList"></ul>
+        </div>
+        <div class="sidebar-footer">
+            <div class="sidebar-footer-card">
+                <div class="footer-avatar">🤖</div>
+                <div class="footer-details">
+                    <div class="footer-name">ScriptForge Pro</div>
+                    <div class="footer-desc">AI Research-to-Script v2.4</div>
+                </div>
+            </div>
+        </div>
+    </aside>
+    <div class="main-area">
+
+    <!-- Steps -->
     <div class="steps-bar">
         <div class="step-wrapper">
-            <div class="step-item">
-                <div class="step-circle active" id="step1">1</div>
-            </div>
+            <div class="step-item"><div class="step-circle active" id="step1">1</div></div>
             <div class="step-label">Nhập đề</div>
         </div>
         <div class="step-line" id="line1"></div>
         <div class="step-wrapper">
-            <div class="step-item">
-                <div class="step-circle" id="step2">2</div>
-            </div>
+            <div class="step-item"><div class="step-circle" id="step2">2</div></div>
             <div class="step-label">Chọn nguồn</div>
         </div>
         <div class="step-line" id="line2"></div>
         <div class="step-wrapper">
-            <div class="step-item">
-                <div class="step-circle" id="step3">3</div>
-            </div>
+            <div class="step-item"><div class="step-circle" id="step3">3</div></div>
             <div class="step-label">AI Draft</div>
         </div>
         <div class="step-line" id="line3"></div>
         <div class="step-wrapper">
-            <div class="step-item">
-                <div class="step-circle" id="step4">4</div>
-            </div>
+            <div class="step-item"><div class="step-circle" id="step4">4</div></div>
             <div class="step-label">Duyệt</div>
         </div>
         <div class="step-line" id="line4"></div>
         <div class="step-wrapper">
-            <div class="step-item">
-                <div class="step-circle" id="step5">5</div>
-            </div>
+            <div class="step-item"><div class="step-circle" id="step5">5</div></div>
             <div class="step-label">Xuất</div>
         </div>
     </div>
 
     <main class="main">
-        <!-- Screen 1: Input Topic -->
+        <!-- Screen 1 -->
         <div class="screen active" id="screen1">
-            <h2 class="screen-title">Bước 1 — Nhập chủ đề kịch bản</h2>
-            <p class="screen-subtitle">
-                Mô tả chủ đề hoặc nội dung bạn muốn viết kịch bản. AI sẽ tìm kiếm trong các nguồn tài liệu bạn chọn ở
-                bước tiếp theo.
-                <span class="g-tag">G1 — Làm rõ hệ thống làm được gì</span>
-            </p>
+            <h2 class="screen-title">Nhập chủ đề kịch bản</h2>
+            <p class="screen-subtitle">Mô tả chủ đề bạn muốn viết kịch bản video. AI sẽ trích dẫn từ tài liệu nguồn bạn chọn ở bước tiếp theo. <span class="g-tag">G1</span></p>
+
             <div class="card">
                 <div class="input-group">
                     <label class="input-label">Chủ đề kịch bản</label>
-                    <input type="text" id="topicInput" value="Giải thích cơ chế Attention trong Transformer"
-                        placeholder="Ví dụ: Giải thích cơ chế Attention trong Transformer">
+                    <input type="text" id="topicInput" value="Giải thích cơ chế Attention trong Transformer" placeholder="Ví dụ: Giải thích cơ chế Attention trong Transformer">
                 </div>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
                     <div class="input-group">
-                        <label class="input-label">Đối tượng người học</label>
-                        <select id="audienceSelect" onchange="toggleCustomInput('audienceSelect','audienceCustom')" style="width:100%;padding:12px 14px;background:var(--bg-primary);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text-primary);font-family:'Inter',sans-serif;font-size:14px;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url('data:image/svg+xml;utf8,<svg fill=\'%238b8fa3\' viewBox=\'0 0 24 24\' xmlns=\'http://www.w3.org/2000/svg\'><path d=\'M7 10l5 5 5-5z\'/></svg>');background-repeat:no-repeat;background-position:right 12px center;background-size:18px;">
+                        <label class="input-label">Đối tượng</label>
+                        <select id="audienceSelect">
                             <option value="beginner" selected>Người mới bắt đầu</option>
                             <option value="intermediate">Đã có kiến thức nền</option>
                             <option value="advanced">Nâng cao / chuyên sâu</option>
-                            <option value="custom">Khác (tự nhập)...</option>
                         </select>
-                        <input type="text" id="audienceCustom" placeholder="Ví dụ: Sinh viên năm 3 ngành CNTT" style="display:none;margin-top:8px;">
                     </div>
                     <div class="input-group">
-                        <label class="input-label">Độ dài video dự kiến</label>
-                        <select id="durationSelect" onchange="toggleCustomInput('durationSelect','durationCustom')" style="width:100%;padding:12px 14px;background:var(--bg-primary);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text-primary);font-family:'Inter',sans-serif;font-size:14px;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url('data:image/svg+xml;utf8,<svg fill=\'%238b8fa3\' viewBox=\'0 0 24 24\' xmlns=\'http://www.w3.org/2000/svg\'><path d=\'M7 10l5 5 5-5z\'/></svg>');background-repeat:no-repeat;background-position:right 12px center;background-size:18px;">
-                            <option value="5">~5 phút (ngắn)</option>
-                            <option value="10" selected>~10 phút (chuẩn)</option>
-                            <option value="15">~15 phút (dài)</option>
-                            <option value="20">~20 phút (chuyên sâu)</option>
-                            <option value="custom">Khác (tự nhập)...</option>
+                        <label class="input-label">Thời lượng</label>
+                        <select id="durationSelect">
+                            <option value="5">~5 phút</option>
+                            <option value="10" selected>~10 phút</option>
+                            <option value="15">~15 phút</option>
                         </select>
-                        <input type="text" id="durationCustom" placeholder="Ví dụ: 25 phút, chia 3 phần" style="display:none;margin-top:8px;">
                     </div>
                 </div>
-                <div class="input-group">
-                    <label class="input-label">Yêu cầu bổ sung (tuỳ chọn)</label>
-                    <textarea rows="3"
-                        placeholder="Ví dụ: Tập trung vào Self-Attention, giải thích đơn giản cho người mới học">Tập trung vào Self-Attention, dùng ví dụ trực quan, giọng thân thiện dễ hiểu</textarea>
+                <div class="input-group" style="margin-bottom:0;">
+                    <label class="input-label">Yêu cầu bổ sung</label>
+                    <textarea rows="2" id="extraInput" style="height:52px;resize:none;" placeholder="Ví dụ: Tập trung vào Self-Attention, dùng ví dụ trực quan">Tập trung vào Self-Attention, dùng ví dụ trực quan, giọng thân thiện dễ hiểu</textarea>
                 </div>
             </div>
-            <div class="warning-banner">
-                ⚠️ ScriptForge chỉ draft kịch bản từ tài liệu bạn chọn — không tự bịa thông tin ngoài nguồn.
-                <span class="g-tag">G2</span>
-            </div>
-            <div class="btn-row">
-                <button class="btn btn-primary" onclick="goToScreen(2)">Tiếp → AI tìm nguồn</button>
-            </div>
+
+            <div class="warning-banner">⚠️ ScriptForge chỉ draft kịch bản từ tài liệu bạn chọn — không tự bịa thông tin ngoài nguồn. <span class="g-tag">G2</span></div>
+            <div class="btn-row"><button class="btn btn-primary" onclick="goToScreen(2)">Tiếp → Chọn nguồn</button></div>
         </div>
 
-        <!-- Screen 2: Select Sources (AI pre-suggested) -->
+        <!-- Screen 2 -->
         <div class="screen" id="screen2">
-            <h2 class="screen-title">Bước 2 — Xác nhận nguồn tài liệu</h2>
-            <p class="screen-subtitle">
-                AI đã quét tất cả tài liệu và xếp hạng theo độ liên quan đến chủ đề của bạn.
-                Kiểm tra và bỏ chọn nguồn không cần thiết.
-                <span class="g-tag">G2 — Làm rõ nó làm tốt đến đâu</span>
-            </p>
-
-            <div style="background:var(--green-bg);border:1px solid var(--green-border);border-radius:var(--radius-sm);padding:12px 16px;font-size:13px;color:var(--green);display:flex;align-items:center;gap:10px;margin-bottom:16px;">
-                🤖 AI đã tìm thấy <strong>3 nguồn liên quan cao</strong> và <strong>3 nguồn liên quan thấp</strong> cho chủ đề "Attention trong Transformer"
-            </div>
-
+            <h2 class="screen-title">Chọn nguồn tài liệu</h2>
+            <p class="screen-subtitle">Chọn transcript / slide chứa nội dung liên quan. AI chỉ trích dẫn từ nguồn bạn chọn. <span class="g-tag">G2</span></p>
             <div class="card">
-                <div class="card-label">🟢 AI đề xuất — Độ liên quan cao</div>
-                <div class="source-grid">
-                    <div class="source-option selected" onclick="toggleSource(this)">
-                        <div class="source-check">✓</div>
-                        <div style="flex:1">
-                            <div class="source-name">Transcript-06 <span style="color:var(--green);font-size:11px;font-weight:700;">95% liên quan</span></div>
-                            <div class="source-desc">Attention & Transformer · 45 phút · Chứa 12 đoạn về Attention</div>
-                        </div>
-                    </div>
-                    <div class="source-option selected" onclick="toggleSource(this)">
-                        <div class="source-check">✓</div>
-                        <div style="flex:1">
-                            <div class="source-name">Slide Bài 3 <span style="color:var(--green);font-size:11px;font-weight:700;">88% liên quan</span></div>
-                            <div class="source-desc">Deep Learning & Attention · 48 slides · Chứa công thức Q,K,V</div>
-                        </div>
-                    </div>
-                    <div class="source-option selected" onclick="toggleSource(this)">
-                        <div class="source-check">✓</div>
-                        <div style="flex:1">
-                            <div class="source-name">Transcript-05 <span style="color:var(--yellow);font-size:11px;font-weight:700;">62% liên quan</span></div>
-                            <div class="source-desc">Sequence Models & RNN · 40 phút · Chứa context về seq2seq trước Attention</div>
-                        </div>
-                    </div>
+                <div class="card-label">📚 Nguồn tài liệu</div>
+                <div class="source-grid" id="sourceGrid">
+                    <div class="source-option selected" onclick="toggleSource(this)" data-source="T06"><div class="source-check">✓</div><div style="flex:1"><div class="source-name">Transcript-06</div><div class="source-desc">Attention & Transformer · 45 phút</div></div></div>
+                    <div class="source-option selected" onclick="toggleSource(this)" data-source="Slide3"><div class="source-check">✓</div><div style="flex:1"><div class="source-name">Slide Bài 3</div><div class="source-desc">Deep Learning & Attention · 48 slides</div></div></div>
+                    <div class="source-option" onclick="toggleSource(this)" data-source="T05"><div class="source-check">✓</div><div style="flex:1"><div class="source-name">Transcript-05</div><div class="source-desc">Sequence Models & RNN · 40 phút</div></div></div>
+                    <div class="source-option" onclick="toggleSource(this)" data-source="T03"><div class="source-check">✓</div><div style="flex:1"><div class="source-name">Transcript-03</div><div class="source-desc">Neural Networks cơ bản · 38 phút</div></div></div>
+                    <div class="source-option" onclick="toggleSource(this)" data-source="Slide2"><div class="source-check">✓</div><div style="flex:1"><div class="source-name">Slide Bài 2</div><div class="source-desc">Neural Networks · 35 slides</div></div></div>
+                    <div class="source-option" onclick="toggleSource(this)" data-source="T01"><div class="source-check">✓</div><div style="flex:1"><div class="source-name">Transcript-01</div><div class="source-desc">Giới thiệu ML · 42 phút</div></div></div>
                 </div>
             </div>
-
-            <div class="card" style="opacity:0.7;">
-                <div class="card-label">⚪ Nguồn khác — Độ liên quan thấp</div>
-                <div class="source-grid">
-                    <div class="source-option" onclick="toggleSource(this)">
-                        <div class="source-check">✓</div>
-                        <div style="flex:1">
-                            <div class="source-name">Transcript-03 <span style="color:var(--text-muted);font-size:11px;font-weight:700;">25% liên quan</span></div>
-                            <div class="source-desc">Neural Networks cơ bản · 38 phút</div>
-                        </div>
-                    </div>
-                    <div class="source-option" onclick="toggleSource(this)">
-                        <div class="source-check">✓</div>
-                        <div style="flex:1">
-                            <div class="source-name">Transcript-01 <span style="color:var(--text-muted);font-size:11px;font-weight:700;">12% liên quan</span></div>
-                            <div class="source-desc">Giới thiệu Machine Learning · 42 phút</div>
-                        </div>
-                    </div>
-                    <div class="source-option" onclick="toggleSource(this)">
-                        <div class="source-check">✓</div>
-                        <div style="flex:1">
-                            <div class="source-name">Slide Bài 2 <span style="color:var(--text-muted);font-size:11px;font-weight:700;">18% liên quan</span></div>
-                            <div class="source-desc">Neural Networks · 35 slides</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card" style="border-style:dashed;">
-                <div class="card-label">➕ Thêm nguồn của bạn</div>
-                <div style="display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end;">
-                    <div>
-                        <input type="text" id="customSourceName" placeholder="Tên nguồn (VD: Bài báo Attention Is All You Need)" style="margin-bottom:8px;">
-                        <input type="text" id="customSourceDesc" placeholder="Mô tả ngắn (VD: Paper gốc · 2017 · 15 trang)">
-                    </div>
-                    <button class="btn btn-secondary" onclick="addCustomSource()" style="height:fit-content;white-space:nowrap;">
-                        + Thêm
-                    </button>
-                </div>
-                <div id="customSourceList" style="margin-top:10px;"></div>
-            </div>
-
             <div class="btn-row">
                 <button class="btn btn-secondary" onclick="goToScreen(1)">← Quay lại</button>
-                <button class="btn btn-primary" onclick="goToScreen(3)">Tiếp → Tạo kịch bản từ nguồn đã chọn</button>
+                <button class="btn btn-primary" onclick="startAIGeneration()">🤖 Tạo kịch bản bằng AI thật</button>
             </div>
         </div>
 
-        <!-- Screen 3: AI Processing (Loading) -->
+        <!-- Screen 3 -->
         <div class="screen" id="screen3">
-            <h2 class="screen-title">Bước 3 — AI đang tạo kịch bản</h2>
-            <p class="screen-subtitle">Đang trích xuất nội dung liên quan và tạo bản nháp có trích dẫn...</p>
+            <h2 class="screen-title">AI đang tạo kịch bản</h2>
+            <p class="screen-subtitle">Đang gọi AI để trích xuất nội dung và tạo bản nháp có trích dẫn...</p>
             <div class="card">
-                <div class="loading-container" id="loadingSpinner">
+                <div class="loading-container">
                     <div class="spinner"></div>
-                    <div class="loading-text">Đang phân tích Transcript-06 và Slide Bài 3...</div>
-                    <div style="margin-top: 8px; font-size: 12px; color: var(--text-muted);">
-                        Tìm đoạn liên quan → Xác minh nguồn → Draft kịch bản → Gắn trích dẫn
-                    </div>
+                    <div class="loading-text" id="loadingText">Đang gửi yêu cầu đến AI...</div>
+                    <div style="margin-top:10px;font-size:12px;color:var(--text-muted);" id="loadingDetail">Phân tích nguồn → Trích dẫn → Draft → Gắn trạng thái</div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-label">📋 AI Trace Log</div>
+                <div class="log-panel" id="aiLogPanel">
+                    <div class="log-entry"><span class="log-timestamp">[waiting]</span> Chờ lệnh gọi AI...</div>
                 </div>
             </div>
         </div>
 
-        <!-- Screen 4: Review Results -->
+        <!-- Screen 4 -->
         <div class="screen" id="screen4">
-            <h2 class="screen-title">Bước 4 — Duyệt kịch bản</h2>
-            <p class="screen-subtitle">
-                Xem từng đoạn, kiểm tra nguồn trích dẫn, chấp nhận hoặc sửa. Bấm vào mã nguồn để xem nội dung gốc.
-                <span class="g-tag">G9 — Sửa dễ dàng</span>
-                <span class="g-tag">G8 — Gạt bỏ dễ</span>
-            </p>
-
-            <div class="stats-bar">
-                <div class="stat-item">
-                    <div class="stat-value green">3</div>
-                    <div class="stat-label">🟢 Có nguồn</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-value yellow">1</div>
-                    <div class="stat-label">🟡 Cần xác minh</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-value red">1</div>
-                    <div class="stat-label">🔴 Không nguồn</div>
-                </div>
-            </div>
-
-            <!-- Segment 1: CITED (Happy Path) -->
-            <div class="segment">
-                <div class="segment-header">
-                    <div class="segment-status">
-                        <div class="status-dot cited"></div>
-                        <span class="status-label cited">CITED</span>
-                        <span style="font-size: 12px; color: var(--text-muted);">— Đoạn 1: Giới thiệu Attention</span>
-                    </div>
-                    <span class="g-tag">Happy path</span>
-                </div>
-                <div class="segment-body">
-                    <div class="segment-text">
-                        Cơ chế Attention cho phép mô hình tập trung vào những phần quan trọng nhất của chuỗi đầu vào khi
-                        xử lý từng phần tử. Thay vì nén toàn bộ câu vào một vector cố định, Attention tính trọng số cho
-                        mỗi vị trí dựa trên mức độ liên quan đến phần tử đang xét.
-                        <span class="citation" onclick="toggleCitation(this)">T06-042</span>
-                    </div>
-                    <div class="segment-source">
-                        📄 <strong>Transcript-06, đoạn 042:</strong> "...attention mechanism giúp model focus vào
-                        relevant parts, thay vì phải compress hết thông tin vào một fixed-size vector..."
-                    </div>
-                    <div class="segment-actions" id="actions1">
-                        <button class="seg-btn" onclick="acceptSeg(this, 'actions1')">✓ Chấp nhận</button>
-                        <button class="seg-btn" onclick="editSeg(this, 'actions1')">✏ Sửa</button>
-                        <button class="seg-btn" onclick="rejectSeg(this, 'actions1')">✗ Bỏ</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Segment 2: CITED -->
-            <div class="segment">
-                <div class="segment-header">
-                    <div class="segment-status">
-                        <div class="status-dot cited"></div>
-                        <span class="status-label cited">CITED</span>
-                        <span style="font-size: 12px; color: var(--text-muted);">— Đoạn 2: Self-Attention</span>
-                    </div>
-                </div>
-                <div class="segment-body">
-                    <div class="segment-text">
-                        Trong Self-Attention, mỗi từ trong câu được so sánh với tất cả các từ còn lại. Mô hình tính ba
-                        vector Query, Key và Value cho mỗi từ, sau đó dùng tích vô hướng giữa Query và Key để xác định
-                        mức độ liên quan.
-                        <span class="citation" onclick="toggleCitation(this)">T06-051</span>
-                        <span class="citation" onclick="toggleCitation(this)">Slide3-p22</span>
-                    </div>
-                    <div class="segment-source">
-                        📄 <strong>Transcript-06, đoạn 051:</strong> "...self-attention, mỗi token sẽ attend to tất cả
-                        token khác. Ta tính Q, K, V — query, key, value — rồi dùng dot product..."
-                    </div>
-                    <div class="segment-source">
-                        📄 <strong>Slide Bài 3, trang 22:</strong> "Self-Attention: Q·K^T / √d_k → softmax → ×V"
-                    </div>
-                    <div class="segment-actions" id="actions2">
-                        <button class="seg-btn" onclick="acceptSeg(this, 'actions2')">✓ Chấp nhận</button>
-                        <button class="seg-btn" onclick="editSeg(this, 'actions2')">✏ Sửa</button>
-                        <button class="seg-btn" onclick="rejectSeg(this, 'actions2')">✗ Bỏ</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Segment 3: CITED -->
-            <div class="segment">
-                <div class="segment-header">
-                    <div class="segment-status">
-                        <div class="status-dot cited"></div>
-                        <span class="status-label cited">CITED</span>
-                        <span style="font-size: 12px; color: var(--text-muted);">— Đoạn 3: Ví dụ trực quan</span>
-                    </div>
-                </div>
-                <div class="segment-body">
-                    <div class="segment-text">
-                        Hãy hình dung bạn đang đọc một câu: "Con mèo ngồi trên thảm vì nó mệt." Khi xử lý từ "nó",
-                        Attention giúp mô hình hiểu rằng "nó" liên quan mạnh nhất đến "con mèo" — trọng số attention
-                        giữa "nó" và "con mèo" sẽ cao nhất.
-                        <span class="citation" onclick="toggleCitation(this)">T06-058</span>
-                    </div>
-                    <div class="segment-source">
-                        📄 <strong>Transcript-06, đoạn 058:</strong> "...ví dụ câu 'the cat sat on the mat because it
-                        was tired', khi process 'it', attention weight cao nhất sẽ point về 'cat'..."
-                    </div>
-                    <div class="segment-actions" id="actions3">
-                        <button class="seg-btn" onclick="acceptSeg(this, 'actions3')">✓ Chấp nhận</button>
-                        <button class="seg-btn" onclick="editSeg(this, 'actions3')">✏ Sửa</button>
-                        <button class="seg-btn" onclick="rejectSeg(this, 'actions3')">✗ Bỏ</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Segment 4: NEEDS_VERIFY (Low-confidence path) -->
-            <div class="segment">
-                <div class="segment-header">
-                    <div class="segment-status">
-                        <div class="status-dot verify"></div>
-                        <span class="status-label verify">NEEDS_VERIFY</span>
-                        <span style="font-size: 12px; color: var(--text-muted);">— Đoạn 4: Multi-Head Attention</span>
-                    </div>
-                    <span class="g-tag">Low-confidence</span>
-                </div>
-                <div class="segment-body">
-                    <div class="warning-banner">
-                        ⚠️ Nguồn tìm được có liên quan nhưng không đề cập trực tiếp — cần người xác minh.
-                        <span class="g-tag">G10 — Thu hẹp khi nghi ngờ</span>
-                    </div>
-                    <div class="segment-text">
-                        Multi-Head Attention mở rộng ý tưởng bằng cách chạy nhiều "đầu" attention song song, mỗi đầu học
-                        cách chú ý vào một khía cạnh khác nhau của dữ liệu — ví dụ một đầu tập trung vào cú pháp, đầu
-                        khác tập trung vào ngữ nghĩa.
-                        <span class="citation" onclick="toggleCitation(this)">T06-063 ?</span>
-                    </div>
-                    <div class="segment-source">
-                        📄 <strong>Transcript-06, đoạn 063:</strong> "...multi-head thì mình chạy nhiều attention head
-                        parallel, mỗi head sẽ capture different aspect..." <em>(đoạn này không nói rõ ví dụ cú pháp/ngữ
-                            nghĩa — AI tự suy luận thêm)</em>
-                    </div>
-                    <div class="segment-actions" id="actions4">
-                        <button class="seg-btn" onclick="acceptSeg(this, 'actions4')">✓ Chấp nhận</button>
-                        <button class="seg-btn" onclick="editSeg(this, 'actions4')">✏ Sửa</button>
-                        <button class="seg-btn" onclick="rejectSeg(this, 'actions4')">✗ Bỏ</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Segment 5: NO_SOURCE (Failure path) -->
-            <div class="segment">
-                <div class="segment-header">
-                    <div class="segment-status">
-                        <div class="status-dot nosource"></div>
-                        <span class="status-label nosource">NO_SOURCE</span>
-                        <span style="font-size: 12px; color: var(--text-muted);">— Đoạn 5: So sánh với CNN/RNN</span>
-                    </div>
-                    <span class="g-tag">Failure path</span>
-                </div>
-                <div class="segment-body">
-                    <div class="failure-banner">
-                        🔴 Không tìm thấy nguồn trong tài liệu đã chọn cho nội dung này. Đoạn này <strong>không được
-                            sinh</strong> — hệ thống từ chối bịa thay vì đoán.
-                        <span class="g-tag">G10</span>
-                    </div>
-                    <div class="segment-text" style="color: var(--text-muted); font-style: italic;">
-                        [Không sinh nội dung] Nội dung so sánh Attention với CNN và RNN không có trong Transcript-06
-                        hoặc Slide Bài 3. Bạn có thể: thêm nguồn chứa nội dung này, hoặc tự viết đoạn này.
-                    </div>
-                    <div class="segment-actions" id="actions5">
-                        <button class="seg-btn" onclick="editSeg(this, 'actions5')">✏ Tự viết đoạn này</button>
-                        <button class="seg-btn" onclick="rejectSeg(this, 'actions5')">✗ Bỏ qua</button>
-                        <button class="seg-btn" onclick="goToScreen(2)">📎 Thêm nguồn</button>
-                    </div>
-                </div>
-            </div>
-
+            <h2 class="screen-title">Duyệt kịch bản</h2>
+            <p class="screen-subtitle">Xem từng đoạn, kiểm tra nguồn, chấp nhận hoặc sửa. <span class="g-tag">G9</span></p>
+            <div class="stats-bar" id="statsBar"></div>
+            <div id="segmentsContainer"></div>
             <div class="btn-row">
                 <button class="btn btn-secondary" onclick="goToScreen(2)">← Chọn lại nguồn</button>
-                <button class="btn btn-primary" onclick="goToScreen(5)">Tiếp → Xuất kịch bản</button>
+                <button class="btn btn-primary" onclick="goToExport()">Tiếp → Xuất kịch bản</button>
             </div>
         </div>
 
-        <!-- Screen 5: Export -->
+        <!-- Screen 5 -->
         <div class="screen" id="screen5">
-            <h2 class="screen-title">Bước 5 — Xuất kịch bản</h2>
-            <p class="screen-subtitle">
-                Kịch bản đã duyệt kèm danh sách nguồn trích dẫn. Bạn có thể tải về hoặc chỉnh sửa thêm.
-                <span class="g-tag">G11 — Giải thích vì sao</span>
-            </p>
+            <h2 class="screen-title">Xuất kịch bản</h2>
+            <p class="screen-subtitle">Kịch bản đã duyệt kèm nguồn trích dẫn. <span class="g-tag">G11</span></p>
             <div class="card">
                 <div class="card-label">Kịch bản hoàn chỉnh</div>
-                <div class="export-preview">Cơ chế Attention cho phép mô hình tập trung vào những phần quan trọng nhất
-                    của chuỗi đầu vào khi xử lý từng phần tử. Thay vì nén toàn bộ câu vào một vector cố định, Attention
-                    tính trọng số cho mỗi vị trí dựa trên mức độ liên quan đến phần tử đang xét. [T06-042]
-
-                    Trong Self-Attention, mỗi từ trong câu được so sánh với tất cả các từ còn lại. Mô hình tính ba
-                    vector Query, Key và Value cho mỗi từ, sau đó dùng tích vô hướng giữa Query và Key để xác định mức
-                    độ liên quan. [T06-051] [Slide3-p22]
-
-                    Hãy hình dung bạn đang đọc một câu: "Con mèo ngồi trên thảm vì nó mệt." Khi xử lý từ "nó", Attention
-                    giúp mô hình hiểu rằng "nó" liên quan mạnh nhất đến "con mèo" — trọng số attention giữa "nó" và "con
-                    mèo" sẽ cao nhất. [T06-058]
-
-                    Multi-Head Attention mở rộng ý tưởng bằng cách chạy nhiều "đầu" attention song song, mỗi đầu học
-                    cách chú ý vào một khía cạnh khác nhau của dữ liệu. [T06-063 — cần xác minh]</div>
+                <div class="export-preview" id="exportPreview"></div>
             </div>
-
-            <div class="ref-list">
-                <h4>📚 Nguồn trích dẫn</h4>
-                <div class="ref-item">• [T06-042] Transcript-06, đoạn 042 — Giới thiệu Attention mechanism</div>
-                <div class="ref-item">• [T06-051] Transcript-06, đoạn 051 — Self-Attention Q, K, V</div>
-                <div class="ref-item">• [Slide3-p22] Slide Bài 3, trang 22 — Công thức Self-Attention</div>
-                <div class="ref-item">• [T06-058] Transcript-06, đoạn 058 — Ví dụ attention weight</div>
-                <div class="ref-item" style="color: var(--yellow);">• [T06-063] Transcript-06, đoạn 063 — Multi-Head (⚠
-                    cần xác minh)</div>
-            </div>
-
-            <div class="stats-bar" style="margin-top: 20px;">
-                <div class="stat-item">
-                    <div class="stat-value" style="color: var(--accent-light);">4</div>
-                    <div class="stat-label">Đoạn được duyệt</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-value green">5</div>
-                    <div class="stat-label">Nguồn trích dẫn</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-value red">1</div>
-                    <div class="stat-label">Đoạn bị từ chối</div>
-                </div>
-            </div>
-
+            <div class="ref-list" id="exportRefs"></div>
+            <div class="stats-bar" id="exportStats" style="margin-top:20px;"></div>
             <div class="btn-row">
                 <button class="btn btn-secondary" onclick="goToScreen(4)">← Quay lại duyệt</button>
-                <button class="btn btn-primary"
-                    onclick="alert('✅ Đã tải kịch bản!\n\nĐây là mock prototype — chưa có AI thật.\nCP3 sẽ tích hợp AI chạy thật.')">📥
-                    Tải kịch bản (.md)</button>
+                <button class="btn btn-secondary" onclick="showFullLog()">📋 Xem AI Log</button>
+                <button class="btn btn-primary" onclick="downloadScript()">📥 Tải kịch bản (.md)</button>
+            </div>
+            <div class="card" style="margin-top:16px;" id="fullLogCard" hidden>
+                <div class="card-label">📋 Toàn bộ AI Trace Log</div>
+                <div class="log-panel" id="fullLogPanel" style="max-height:500px;"></div>
             </div>
         </div>
     </main>
+    </div>
+    </div>
+    <button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()">📜</button>
 
     <script>
-        let currentScreen = 1;
+        let currentScreen = 1, aiSegments = [], traceLog = [], sfHistory = [], activeHistoryId = null;
+        const TRANSCRIPT_DATA = {
+            "T06": { name: "Transcript-06: Attention & Transformer", segments: { "T06-038": "Trước khi nói về Transformer, mình cần hiểu vấn đề của RNN truyền thống. RNN xử lý tuần tự, token này xong mới đến token kia, nên rất chậm khi câu dài.", "T06-042": "Attention mechanism giúp model focus vào relevant parts của input sequence, thay vì phải compress hết thông tin vào một fixed-size vector. Đây là breakthrough lớn trong NLP.", "T06-045": "Có nhiều loại attention: additive attention của Bahdanau, multiplicative attention, và quan trọng nhất là scaled dot-product attention được dùng trong Transformer.", "T06-051": "Trong self-attention, mỗi token sẽ attend to tất cả token khác trong sequence. Ta tính ba vector Q (Query), K (Key), V (Value) cho mỗi token, rồi dùng dot product giữa Q và K để tính attention weights.", "T06-055": "Công thức chính: Attention(Q,K,V) = softmax(QK^T / sqrt(d_k)) × V. Phần chia cho sqrt(d_k) là scaled factor, giúp gradient stable hơn khi d_k lớn.", "T06-058": "Ví dụ câu 'the cat sat on the mat because it was tired', khi process token 'it', attention weight cao nhất sẽ point về 'cat'. Đây là cách model hiểu coreference.", "T06-063": "Multi-head attention thì mình chạy nhiều attention head parallel, mỗi head sẽ capture different aspect của relationship giữa các tokens. Thường dùng 8 heads.", "T06-067": "Transformer architecture gồm encoder stack và decoder stack. Encoder dùng self-attention, decoder dùng masked self-attention và cross-attention.", "T06-072": "Positional encoding được thêm vào input embeddings vì Transformer không có recurrence. Dùng sin/cos functions ở different frequencies." } },
+            "Slide3": { name: "Slide Bài 3: Deep Learning & Attention", segments: { "Slide3-p15": "Sequence-to-Sequence Model: Encoder compresses input → fixed vector → Decoder generates output. Vấn đề: bottleneck khi sequence dài.", "Slide3-p18": "Bahdanau Attention (2014): Thay vì dùng 1 fixed vector, decoder attend to different parts of encoder output at each step.", "Slide3-p22": "Self-Attention Formula: Attention(Q,K,V) = softmax(Q·K^T / √d_k) × V. Q = XW_Q, K = XW_K, V = XW_V.", "Slide3-p25": "Multi-Head Attention: MultiHead(Q,K,V) = Concat(head_1,...,head_h)W_O. Mỗi head_i = Attention(QW_i^Q, KW_i^K, KW_i^V).", "Slide3-p30": "Transformer Architecture: 6 encoder layers + 6 decoder layers. Mỗi layer có: Multi-Head Attention → Add&Norm → FFN → Add&Norm.", "Slide3-p35": "Positional Encoding: PE(pos,2i) = sin(pos/10000^(2i/d_model)), PE(pos,2i+1) = cos(pos/10000^(2i/d_model))." } },
+            "T05": { name: "Transcript-05: Sequence Models & RNN", segments: { "T05-012": "RNN basic idea: hidden state h_t = f(h_{t-1}, x_t). Mỗi time step, model cập nhật hidden state dựa trên input hiện tại và state trước đó.", "T05-025": "Vanishing gradient problem: khi backpropagate qua nhiều time steps, gradient nhân nhiều lần → shrink về 0. LSTM và GRU được thiết kế để giải quyết vấn đề này.", "T05-035": "LSTM có 3 gates: forget gate, input gate, output gate. Cell state chạy xuyên suốt giúp gradient flow tốt hơn.", "T05-042": "Seq2seq model: encoder RNN đọc input, nén vào context vector, decoder RNN generate output từ context vector đó." } },
+            "T03": { name: "Transcript-03: Neural Networks cơ bản", segments: { "T03-008": "Perceptron là đơn vị cơ bản nhất: y = activation(Σ w_i·x_i + b). Mô phỏng 1 neuron sinh học.", "T03-015": "Feedforward neural network: nhiều layer, mỗi layer nhiều neurons. Input → Hidden layers → Output. Thông tin chỉ đi một chiều.", "T03-028": "Backpropagation: tính gradient của loss theo từng weight bằng chain rule, rồi update weight theo hướng giảm loss.", "T03-035": "Gradient descent: w_new = w_old - learning_rate × gradient. Learning rate quá lớn → diverge, quá nhỏ → converge chậm.", "T03-045": "Loss functions phổ biến: MSE cho regression, Cross-entropy cho classification. Loss đo khoảng cách giữa prediction và ground truth.", "T03-052": "Regularization: L1, L2, Dropout — giúp model không overfit. L2 thêm λ·||w||² vào loss function." } },
+            "T01": { name: "Transcript-01: Giới thiệu Machine Learning", segments: { "T01-005": "Machine Learning là lĩnh vực cho máy tính khả năng học từ dữ liệu mà không cần lập trình tường minh từng rule.", "T01-015": "3 loại ML chính: Supervised (có label), Unsupervised (không label), Reinforcement (reward signal).", "T01-030": "Overfitting vs Underfitting: model quá phức tạp → overfit training data, model quá đơn giản → underfit." } },
+            "Slide2": { name: "Slide Bài 2: Neural Networks", segments: { "Slide2-p08": "Activation Functions: sigmoid, tanh, ReLU, Leaky ReLU. ReLU phổ biến nhất hiện nay: f(x) = max(0, x).", "Slide2-p15": "Universal Approximation Theorem: NN với 1 hidden layer đủ rộng có thể xấp xỉ bất kỳ continuous function nào.", "Slide2-p22": "Optimization: SGD, Adam, RMSprop. Adam kết hợp momentum và adaptive learning rate." } }
+        };
 
-        function goToScreen(n) {
-            // Hide all screens
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        function timestamp() { return new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' }); }
+        function addLog(label, msg, isErr = false) {
+            const ts = timestamp(); traceLog.push({ ts, label, message: msg, isError: isErr });
+            const p = document.getElementById('aiLogPanel'), d = document.createElement('div');
+            d.className = 'log-entry';
+            d.innerHTML = `<span class="log-timestamp">[${ts}]</span> <span class="${isErr ? 'log-error' : 'log-label'}">[${label}]</span> ${msg}`;
+            p.appendChild(d); p.scrollTop = p.scrollHeight;
+        }
 
-            // Update steps
-            for (let i = 1; i <= 5; i++) {
-                const circle = document.getElementById('step' + i);
-                circle.classList.remove('active', 'done');
-                if (i < n) circle.classList.add('done');
-                if (i === n) circle.classList.add('active');
-
-                if (i < 5) {
-                    const line = document.getElementById('line' + i);
-                    line.classList.toggle('done', i < n);
+        async function testConnection() {
+            const s = document.getElementById('apiStatus');
+            const btn = document.getElementById('btnTestConn');
+            if (btn) {
+                btn.classList.add('testing');
+                const txt = btn.querySelector('.test-text');
+                if (txt) txt.textContent = 'Đang kiểm tra...';
+            }
+            s.textContent = '⚡ Kiểm tra...'; s.className = 'api-status';
+            try {
+                const r = await fetch('/api/test', { method: 'POST' }), d = await r.json();
+                if (d.ok) { s.textContent = `✅ ${d.model}`; s.className = 'api-status connected'; addLog('OK', `Model: ${d.model}`); }
+                else { s.textContent = '❌ Lỗi'; s.className = 'api-status disconnected'; addLog('ERR', d.error, true); }
+            } catch (e) { s.textContent = '❌ Server chưa chạy'; s.className = 'api-status disconnected'; addLog('ERR', e.message, true); }
+            finally {
+                if (btn) {
+                    btn.classList.remove('testing');
+                    const txt = btn.querySelector('.test-text');
+                    if (txt) txt.textContent = 'Kiểm tra kết nối';
                 }
             }
-
-            // If going to screen 3 (loading), show spinner then auto-advance
-            if (n === 3) {
-                document.getElementById('screen3').classList.add('active');
-                setTimeout(() => {
-                    goToScreen(4);
-                }, 2500);
-            } else {
-                document.getElementById('screen' + n).classList.add('active');
-            }
-
-            currentScreen = n;
-            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        function toggleSource(el) {
-            el.classList.toggle('selected');
+        function getSelectedSources() { return [...document.querySelectorAll('.source-option.selected')].map(el => el.dataset.source).filter(k => k && TRANSCRIPT_DATA[k]); }
+        function buildSourceContext(keys) { let c = ''; keys.forEach(k => { const s = TRANSCRIPT_DATA[k]; c += `\n=== ${s.name} ===\n`; for (const [id, t] of Object.entries(s.segments)) c += `[${id}]: "${t}"\n`; }); return c; }
+
+        async function startAIGeneration() {
+            const sources = getSelectedSources();
+            if (!sources.length) { alert('Chọn ít nhất 1 nguồn.'); return; }
+            activeHistoryId = null;
+            renderHistory();
+            goToScreen(3);
+            document.getElementById('aiLogPanel').innerHTML = '';
+            addLog('START', 'RAG + Citation (backend)');
+            const topic = document.getElementById('topicInput').value.trim(), aud = document.getElementById('audienceSelect').value, dur = document.getElementById('durationSelect').value, extra = document.getElementById('extraInput').value.trim(), ctx = buildSourceContext(sources);
+            addLog('INPUT', `"${topic}" | ${aud} | ${dur}min`);
+            document.getElementById('loadingText').textContent = 'Đang gửi đến AI...';
+            try {
+                const res = await fetch('/api/generate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ topic, audience: aud === 'beginner' ? 'Người mới' : aud === 'intermediate' ? 'Trung cấp' : 'Nâng cao', duration: dur, extra: extra || 'Không', sources, sourceContext: ctx }) });
+                const data = await res.json();
+                if (data.traceLog) data.traceLog.forEach(e => addLog(e.label, e.msg, (e.label || '').includes('ERROR')));
+                if (!data.ok) throw new Error(data.error || 'Lỗi');
+                addLog('DONE', `${data.segments.length} đoạn | ${data.tokens} tokens | ${data.elapsed}s`);
+                aiSegments = data.segments; renderResults(data.segments); goToScreen(4);
+                activeHistoryId = saveToHistory(topic, data.segments, traceLog);
+            } catch (err) { addLog('FATAL', err.message, true); document.getElementById('loadingText').textContent = '❌ ' + err.message; document.getElementById('loadingDetail').innerHTML = `<button class="btn btn-secondary" onclick="goToScreen(2)" style="margin-top:12px;">← Thử lại</button>`; }
         }
 
-        function toggleCitation(el) {
-            const source = el.closest('.segment-body').querySelector('.segment-source');
-            if (source) {
-                // Toggle all sources in this segment
-                const sources = el.closest('.segment-body').querySelectorAll('.segment-source');
-                sources.forEach(s => s.classList.toggle('show'));
-            }
-        }
+        function renderResults(segs) {
+            const c = document.getElementById('segmentsContainer'); c.innerHTML = '';
+            const ci = segs.filter(s => s.status === 'CITED').length, vr = segs.filter(s => s.status === 'NEEDS_VERIFY').length, ns = segs.filter(s => s.status === 'NO_SOURCE').length;
+            document.getElementById('statsBar').innerHTML = `<div class="stat-item"><div class="stat-value green">${ci}</div><div class="stat-label">🟢 CITED</div></div><div class="stat-item"><div class="stat-value yellow">${vr}</div><div class="stat-label">🟡 XÁC MINH</div></div><div class="stat-item"><div class="stat-value red">${ns}</div><div class="stat-label">🔴 KHÔNG NGUỒN</div></div>`;
+            segs.forEach((s, i) => {
+                const sc = s.status === 'CITED' ? 'cited' : s.status === 'NEEDS_VERIFY' ? 'verify' : 'nosource';
+                const pl = s.status === 'CITED' ? 'HAPPY PATH' : s.status === 'NEEDS_VERIFY' ? 'LOW-CONFIDENCE' : 'FAILURE PATH';
+                let bn = '';
+                if (s.status === 'NEEDS_VERIFY') bn = `<div class="warning-banner">⚠️ ${s.confidence_note || 'Nguồn liên quan nhưng không trực tiếp.'} <span class="g-tag">G10</span></div>`;
+                else if (s.status === 'NO_SOURCE') bn = `<div class="failure-banner">🔴 ${s.confidence_note || 'Không tìm thấy nguồn.'} Đoạn này <strong>không được sinh</strong>. <span class="g-tag">G10</span></div>`;
+                const ct = (s.citations || []).map(x => `<span class="citation" onclick="toggleCitation(this)">${x}</span>`).join(' ');
+                const sr = (s.source_quotes || []).map((q, qi) => `<div class="segment-source">📄 <strong>${(s.citations || [])[qi] || ''}:</strong> "${q}"</div>`).join('');
+                const tx = s.status === 'NO_SOURCE' ? `<div class="segment-text" style="color:var(--text-muted);font-style:italic;">[Không sinh] ${s.content || ''}</div>` : `<div class="segment-text" id="segText${i}">${s.content} ${ct}</div>`;
+                const ac = s.status === 'NO_SOURCE' ? `<button class="seg-btn seg-btn-edit" onclick="enableEdit(${i})">✏ Tự viết</button><button class="seg-btn seg-btn-reject" onclick="rejectSeg(this,'a${i}')">✗ Bỏ đoạn</button><button class="seg-btn seg-btn-source" onclick="goToScreen(2)">📎 Thêm nguồn</button>` : `<button class="seg-btn seg-btn-accept" onclick="acceptSeg(this,'a${i}')">✓ Chấp nhận</button><button class="seg-btn seg-btn-edit" onclick="enableEdit(${i})">✏ Sửa nội dung</button><button class="seg-btn seg-btn-reject" onclick="rejectSeg(this,'a${i}')">✗ Bỏ đoạn</button>`;
 
-        function acceptSeg(btn, groupId) {
-            resetBtns(groupId);
-            btn.classList.add('accepted');
-            btn.textContent = '✓ Đã chấp nhận';
-        }
+                const slideTitle = s.slide_title || s.title || `Slide ${i + 1}`;
+                const metaBox = (s.purpose || s.visual_cue || s.key_takeaway) ? `
+                    <div class="slide-meta-box">
+                        ${s.purpose ? `
+                        <div class="slide-meta-item">
+                            <div class="slide-meta-label purpose">🎯 Mục đích slide</div>
+                            <div class="slide-meta-value">${escHtml(s.purpose)}</div>
+                        </div>` : ''}
+                        ${s.visual_cue ? `
+                        <div class="slide-meta-item">
+                            <div class="slide-meta-label visual">🖼️ Gợi ý hình ảnh</div>
+                            <div class="slide-meta-value">${escHtml(s.visual_cue)}</div>
+                        </div>` : ''}
+                        ${s.key_takeaway ? `
+                        <div class="slide-meta-item">
+                            <div class="slide-meta-label takeaway">💡 Người xem nhận ra</div>
+                            <div class="slide-meta-value">${escHtml(s.key_takeaway)}</div>
+                        </div>` : ''}
+                    </div>` : '';
 
-        function editSeg(btn, groupId) {
-            resetBtns(groupId);
-            btn.classList.add('editing');
-            btn.textContent = '✏ Đang sửa...';
-        }
-
-        function rejectSeg(btn, groupId) {
-            resetBtns(groupId);
-            btn.classList.add('rejected');
-            btn.textContent = '✗ Đã bỏ';
-            // Dim the segment
-            btn.closest('.segment').style.opacity = '0.5';
-        }
-
-        function resetBtns(groupId) {
-            const group = document.getElementById(groupId);
-            group.querySelectorAll('.seg-btn').forEach(b => {
-                b.classList.remove('accepted', 'rejected', 'editing');
+                c.innerHTML += `
+                <div class="segment" id="segment${i}">
+                    <div class="slide-header-bar">
+                        <div class="slide-title-wrap">
+                            <span class="slide-number-badge">SLIDE ${i + 1}</span>
+                            <span class="slide-title-text">${escHtml(slideTitle)}</span>
+                        </div>
+                        <div class="segment-status">
+                            <div class="status-dot ${sc}"></div>
+                            <span class="status-label ${sc}">${s.status}</span>
+                            <span class="g-tag">${pl}</span>
+                        </div>
+                    </div>
+                    <div class="segment-body">
+                        ${bn}
+                        ${metaBox}
+                        <div class="script-section-header">🎙️ Lời thoại thuyết trình (Voiceover Script)</div>
+                        ${tx}
+                        ${sr}
+                        <div class="segment-actions" id="a${i}">${ac}</div>
+                    </div>
+                </div>`;
             });
-            group.closest('.segment').style.opacity = '1';
         }
 
-        function addCustomSource() {
-            const name = document.getElementById('customSourceName').value.trim();
-            const desc = document.getElementById('customSourceDesc').value.trim();
-            if (!name) { document.getElementById('customSourceName').focus(); return; }
+        function acceptSeg(b, g) { resetBtns(g); b.classList.add('accepted'); b.textContent = '✓ Đã chấp nhận'; }
+        function enableEdit(i) { const t = document.getElementById(`segText${i}`); if (t) { t.contentEditable = true; t.classList.add('editable'); t.focus(); } const a = document.getElementById(`a${i}`); if (a) { a.querySelectorAll('.seg-btn').forEach(b => b.classList.remove('accepted','rejected','editing')); const e = a.querySelector('.seg-btn-edit'); if (e) { e.classList.add('editing'); e.textContent = '✏ Đang sửa...'; } } }
+        function rejectSeg(b, g) { resetBtns(g); b.classList.add('rejected'); b.textContent = '✗ Đã bỏ'; b.closest('.segment').style.opacity = '0.4'; }
+        function resetBtns(g) { const el = document.getElementById(g); if (!el) return; el.querySelectorAll('.seg-btn').forEach(b => b.classList.remove('accepted','rejected','editing')); el.closest('.segment').style.opacity = '1'; }
+        function toggleCitation(el) { el.closest('.segment-body').querySelectorAll('.segment-source').forEach(s => s.classList.toggle('show')); }
 
-            const list = document.getElementById('customSourceList');
-            const item = document.createElement('div');
-            item.className = 'source-option selected';
-            item.onclick = function() { toggleSource(this); };
-            item.innerHTML = `
-                <div class="source-check">✓</div>
-                <div style="flex:1">
-                    <div class="source-name">${name} <span style="color:var(--accent-light);font-size:11px;font-weight:700;">Người dùng thêm</span></div>
-                    <div class="source-desc">${desc || 'Nguồn tuỳ chỉnh'}</div>
-                </div>
-            `;
-            list.appendChild(item);
-
-            document.getElementById('customSourceName').value = '';
-            document.getElementById('customSourceDesc').value = '';
+        function goToExport() {
+            goToScreen(5); let text = '', refs = [], acc = 0, rej = 0;
+            aiSegments.forEach((s, i) => {
+                const el = document.getElementById(`segment${i}`);
+                if (el && el.style.opacity === '0.4') { rej++; return; }
+                const title = s.slide_title || s.title || `Slide ${i + 1}`;
+                if (s.status === 'NO_SOURCE') {
+                    const t = document.getElementById(`segText${i}`);
+                    if (t && t.textContent.trim() && !t.textContent.includes('[Không sinh]')) {
+                        text += `## ${title}\n\n${t.textContent}\n\n---\n\n`;
+                        acc++;
+                    }
+                    return;
+                }
+                acc++;
+                let t = s.content;
+                if (s.citations) {
+                    t += ' ' + s.citations.map(c => `[${c}]`).join(' ');
+                    s.citations.forEach((c, ci) => refs.push({ id: c, quote: (s.source_quotes || [])[ci] || '', status: s.status }));
+                }
+                text += `## ${title}\n`;
+                if (s.purpose) text += `🎯 **Mục đích:** ${s.purpose}\n\n`;
+                if (s.visual_cue) text += `🖼️ **Gợi ý hình ảnh:** ${s.visual_cue}\n\n`;
+                if (s.key_takeaway) text += `💡 **Người xem nhận ra:** ${s.key_takeaway}\n\n`;
+                text += `🎙️ **Lời thoại thuyết trình:**\n${t}\n\n---\n\n`;
+            });
+            document.getElementById('exportPreview').textContent = text;
+            document.getElementById('exportRefs').innerHTML = '<h4>📚 Nguồn trích dẫn</h4>' + refs.map(r => `<div class="ref-item ${r.status === 'NEEDS_VERIFY' ? 'warning' : ''}">• [${r.id}] ${r.quote} ${r.status === 'NEEDS_VERIFY' ? '⚠ cần xác minh' : ''}</div>`).join('');
+            document.getElementById('exportStats').innerHTML = `<div class="stat-item"><div class="stat-value" style="color:var(--accent)">${acc}</div><div class="stat-label">Đoạn duyệt</div></div><div class="stat-item"><div class="stat-value green">${refs.length}</div><div class="stat-label">Trích dẫn</div></div><div class="stat-item"><div class="stat-value red">${rej}</div><div class="stat-label">Bị bỏ</div></div>`;
         }
 
-        function toggleCustomInput(selectId, inputId) {
-            const sel = document.getElementById(selectId);
-            const inp = document.getElementById(inputId);
-            if (sel.value === 'custom') {
-                inp.style.display = 'block';
-                inp.focus();
-            } else {
-                inp.style.display = 'none';
-                inp.value = '';
+        function showFullLog() { const c = document.getElementById('fullLogCard'); c.hidden = !c.hidden; if (!c.hidden) document.getElementById('fullLogPanel').innerHTML = traceLog.map(e => `<div class="log-entry"><span class="log-timestamp">[${e.ts}]</span> <span class="${e.isError ? 'log-error' : 'log-label'}">[${e.label}]</span> ${e.message}</div>`).join(''); }
+
+        function downloadScript() {
+            const content = document.getElementById('exportPreview').textContent, refs = document.getElementById('exportRefs').innerText;
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(new Blob([`# Kịch bản & Thiết kế Slide — ${document.getElementById('topicInput').value}\n\nScriptForge AI\n${new Date().toLocaleDateString('vi-VN')}\n\n---\n\n${content}\n---\n\n${refs}\n\n---\n\n## Trace Log\n\n${traceLog.map(e => `[${e.ts}] [${e.label}] ${e.message}`).join('\n')}`], { type: 'text/markdown' }));
+            a.download = 'scriptforge-output.md'; a.click();
+        }
+
+        function goToScreen(n) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            for (let i = 1; i <= 5; i++) { const c = document.getElementById('step' + i); c.classList.remove('active', 'done'); if (i < n) c.classList.add('done'); if (i === n) c.classList.add('active'); if (i < 5) document.getElementById('line' + i).classList.toggle('done', i < n); }
+            document.getElementById('screen' + n).classList.add('active'); currentScreen = n; window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function toggleSource(el) { el.classList.toggle('selected'); }
+
+        // ==================== HISTORY ====================
+        let historySearchQuery = '';
+
+        function filterHistory(q) {
+            historySearchQuery = (q || '').toLowerCase().trim();
+            renderHistory();
+        }
+
+        function loadHistory() {
+            try { sfHistory = JSON.parse(localStorage.getItem('sf_history') || '[]'); } catch(e) { sfHistory = []; }
+            renderHistory();
+        }
+
+        function saveToHistory(topic, segments, log) {
+            const entry = {
+                id: Date.now(), topic,
+                time: new Date().toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh', hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit' }),
+                segments: segments.map(s => ({
+                    slide_title: s.slide_title,
+                    title: s.title,
+                    status: s.status,
+                    purpose: s.purpose,
+                    visual_cue: s.visual_cue,
+                    key_takeaway: s.key_takeaway,
+                    content: s.content,
+                    citations: s.citations,
+                    source_quotes: s.source_quotes,
+                    confidence_note: s.confidence_note
+                })),
+                log: (log || []).slice(-20),
+                cited: segments.filter(s => s.status === 'CITED').length,
+                verify: segments.filter(s => s.status === 'NEEDS_VERIFY').length,
+                nosource: segments.filter(s => s.status === 'NO_SOURCE').length,
+            };
+            activeHistoryId = entry.id;
+            sfHistory.unshift(entry);
+            if (sfHistory.length > 30) sfHistory = sfHistory.slice(0, 30);
+            try { localStorage.setItem('sf_history', JSON.stringify(sfHistory)); } catch(e) { console.warn('localStorage full'); }
+            renderHistory();
+            const sb = document.querySelector('.sidebar-scroll-area');
+            if (sb) sb.scrollTop = 0;
+            return entry.id;
+        }
+
+        function startNewScript() {
+            activeHistoryId = null;
+            goToScreen(1);
+            renderHistory();
+            const sb = document.getElementById('sidebar');
+            if (sb) sb.classList.remove('open');
+            const sbo = document.getElementById('sidebarOverlay');
+            if (sbo) sbo.classList.remove('open');
+        }
+
+        function escHtml(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+        function renderHistory() {
+            const list = document.getElementById('historyList'), empty = document.getElementById('sidebarEmpty'), count = document.getElementById('historyCount');
+            if (!list) return;
+            if (count) count.textContent = sfHistory.length;
+
+            const filtered = sfHistory.filter(h => {
+                if (!historySearchQuery) return true;
+                const q = historySearchQuery;
+                const topicMatch = (h.topic || '').toLowerCase().includes(q);
+                const timeMatch = (h.time || '').toLowerCase().includes(q);
+                const segMatch = (h.segments || []).some(s =>
+                    (s.title || '').toLowerCase().includes(q) ||
+                    (s.slide_title || '').toLowerCase().includes(q) ||
+                    (s.purpose || '').toLowerCase().includes(q) ||
+                    (s.visual_cue || '').toLowerCase().includes(q) ||
+                    (s.key_takeaway || '').toLowerCase().includes(q) ||
+                    (s.content || '').toLowerCase().includes(q) ||
+                    (s.citations || []).some(c => (c || '').toLowerCase().includes(q))
+                );
+                return topicMatch || timeMatch || segMatch;
+            });
+
+            if (!sfHistory.length) {
+                empty.style.display = 'block';
+                empty.innerHTML = '<div class="sidebar-empty-icon">📝</div>Chưa có kịch bản nào.<br>Tạo mới để lưu ở đây.';
+                list.innerHTML = '';
+                return;
             }
+
+            if (!filtered.length) {
+                empty.style.display = 'block';
+                empty.innerHTML = '<div class="sidebar-empty-icon">🔍</div>Không tìm thấy kịch bản<br>phù hợp từ khóa.';
+                list.innerHTML = '';
+                return;
+            }
+
+            empty.style.display = 'none';
+            list.innerHTML = filtered.map(h => `
+                <li class="history-item ${h.id === activeHistoryId ? 'active' : ''}" onclick="loadFromHistory(${h.id})">
+                    <div class="history-item-top">
+                        <div class="history-title-wrap">
+                            <span class="history-icon">💬</span>
+                            <span class="history-topic" title="${escHtml(h.topic || '(trống)')}">${escHtml(h.topic || '(trống)')}</span>
+                        </div>
+                        <button class="history-trash-btn" onclick="event.stopPropagation();deleteFromHistory(${h.id})" title="Xóa kịch bản này">
+                            🗑
+                        </button>
+                    </div>
+                    <div class="history-meta">
+                        <span>🕒 ${h.time}</span>
+                        <span class="meta-dot">•</span>
+                        <span>📑 ${(h.segments || []).length} đoạn</span>
+                    </div>
+                    <div class="history-stats">
+                        ${h.cited ? '<span class="history-stat cited">🟢 ' + h.cited + ' cited</span>' : ''}
+                        ${h.verify ? '<span class="history-stat verify">🟡 ' + h.verify + ' xác minh</span>' : ''}
+                        ${h.nosource ? '<span class="history-stat nosource">🔴 ' + h.nosource + ' không nguồn</span>' : ''}
+                    </div>
+                </li>
+            `).join('');
         }
 
-        // Sources are pre-selected by AI in HTML (selected class)
+        function loadFromHistory(id) {
+            const entry = sfHistory.find(h => h.id === id);
+            if (!entry) return;
+            activeHistoryId = id;
+            aiSegments = entry.segments;
+            traceLog = entry.log || [];
+            document.getElementById('topicInput').value = entry.topic || '';
+            renderResults(entry.segments);
+            goToScreen(4);
+            renderHistory();
+            document.getElementById('sidebar').classList.remove('open');
+            document.getElementById('sidebarOverlay').classList.remove('open');
+        }
+
+        function deleteFromHistory(id) {
+            sfHistory = sfHistory.filter(h => h.id !== id);
+            if (activeHistoryId === id) activeHistoryId = null;
+            try { localStorage.setItem('sf_history', JSON.stringify(sfHistory)); } catch(e) {}
+            renderHistory();
+        }
+
+        function clearHistory() {
+            if (!confirm('Xóa toàn bộ lịch sử?')) return;
+            sfHistory = []; activeHistoryId = null;
+            try { localStorage.setItem('sf_history', '[]'); } catch(e) {}
+            renderHistory();
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+            document.getElementById('sidebarOverlay').classList.toggle('open');
+        }
+
+        window.addEventListener('load', () => { setTimeout(testConnection, 400); loadHistory(); });
     </script>
 </body>
-
 </html>

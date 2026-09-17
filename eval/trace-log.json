@@ -1,0 +1,360 @@
+[
+  {
+    "caseId": "GS-01",
+    "topic": "Giải thích cơ chế Attention trong Transformer",
+    "sources": [
+      "T06",
+      "Slide3"
+    ],
+    "promptLength": 2710,
+    "responseLength": 5938,
+    "segments": 5,
+    "statuses": [
+      "CITED",
+      "CITED",
+      "CITED",
+      "CITED",
+      "CITED"
+    ],
+    "rawResponsePreview": "[\n  {\n    \"title\": \"1. Vì sao cần Attention?\",\n    \"status\": \"CITED\",\n    \"content\": \"Trước khi tìm hiểu Transformer, hãy nhìn vào hạn chế của RNN (Recurrent Neural Network — mạng nơ-ron hồi quy). RNN xử lý tuần tự: token này phải được xử lý xong rồi mới đến token tiếp theo, nên rất chậm khi câu dài"
+  },
+  {
+    "caseId": "GS-02",
+    "topic": "Self-Attention là gì, giải thích Q K V",
+    "sources": [
+      "T06"
+    ],
+    "promptLength": 1851,
+    "responseLength": 4249,
+    "segments": 4,
+    "statuses": [
+      "CITED",
+      "CITED",
+      "CITED",
+      "CITED"
+    ],
+    "rawResponsePreview": "[\n  {\n    \"title\": \"1. Vì sao cần Attention?\",\n    \"status\": \"CITED\",\n    \"content\": \"Để hiểu Self-Attention, trước hết hãy nhìn vào hạn chế của RNN truyền thống. RNN xử lý tuần tự: token này phải xong thì mới đến token kia, vì vậy khi câu dài, quá trình xử lý trở nên rất chậm. Attention mechanism, "
+  },
+  {
+    "caseId": "GS-03",
+    "topic": "Ví dụ trực quan về Attention weight",
+    "sources": [
+      "T06"
+    ],
+    "promptLength": 1848,
+    "responseLength": 3734,
+    "segments": 4,
+    "statuses": [
+      "CITED",
+      "CITED",
+      "CITED",
+      "CITED"
+    ],
+    "rawResponsePreview": "[\n  {\n    \"title\": \"Attention weight là gì?\",\n    \"status\": \"CITED\",\n    \"content\": \"Khi xử lý một câu dài, RNN truyền thống phải đọc tuần tự: token này xong mới đến token kia, nên rất chậm. Attention mechanism, hay cơ chế chú ý, giúp model tập trung vào những phần liên quan của input sequence, thay"
+  },
+  {
+    "caseId": "GS-04",
+    "topic": "Giải thích Backpropagation",
+    "sources": [
+      "T03",
+      "Slide2"
+    ],
+    "promptLength": 1419,
+    "responseLength": 4716,
+    "segments": 5,
+    "statuses": [
+      "CITED",
+      "CITED",
+      "CITED",
+      "CITED",
+      "CITED"
+    ],
+    "rawResponsePreview": "[\n  {\n    \"title\": \"1. Neural Network là gì?\",\n    \"status\": \"CITED\",\n    \"content\": \"Để hiểu Backpropagation, trước hết cần hình dung cấu trúc của một Neural Network (mạng nơ-ron). Perceptron là đơn vị cơ bản nhất, mô phỏng một neuron sinh học, với công thức: y = activation(Σ w_i·x_i + b). Trong Fe"
+  },
+  {
+    "caseId": "GS-05",
+    "topic": "Neural Network cơ bản — perceptron và layer",
+    "sources": [
+      "T03"
+    ],
+    "promptLength": 1056,
+    "responseLength": 2609,
+    "segments": 4,
+    "statuses": [
+      "CITED",
+      "CITED",
+      "CITED",
+      "CITED"
+    ],
+    "rawResponsePreview": "[\n  {\n    \"title\": \"Perceptron — đơn vị cơ bản của Neural Network\",\n    \"status\": \"CITED\",\n    \"content\": \"Perceptron là đơn vị cơ bản nhất của Neural Network, mô phỏng một neuron sinh học. Nó nhận các đầu vào x_i, kết hợp với các trọng số w_i và bias b, sau đó đưa kết quả qua activation (hàm kích h"
+  },
+  {
+    "caseId": "GS-06",
+    "topic": "Sequence-to-Sequence model là gì",
+    "sources": [
+      "T05"
+    ],
+    "promptLength": 858,
+    "responseLength": 2678,
+    "segments": 4,
+    "statuses": [
+      "CITED",
+      "CITED",
+      "CITED",
+      "CITED"
+    ],
+    "rawResponsePreview": "[\n  {\n    \"title\": \"RNN là nền tảng của Sequence-to-Sequence\",\n    \"status\": \"CITED\",\n    \"content\": \"Để hiểu Sequence-to-Sequence model, trước hết cần biết RNN (Recurrent Neural Network — mạng nơ-ron hồi quy). Ở mỗi time step (bước thời gian), RNN cập nhật hidden state (trạng thái ẩn) dựa trên inpu"
+  },
+  {
+    "caseId": "GS-07",
+    "topic": "Giải thích Gradient Descent",
+    "sources": [
+      "T03",
+      "Slide2"
+    ],
+    "promptLength": 1420,
+    "responseLength": 3780,
+    "segments": 4,
+    "statuses": [
+      "CITED",
+      "CITED",
+      "CITED",
+      "CITED"
+    ],
+    "rawResponsePreview": "[\n  {\n    \"title\": \"Gradient Descent là gì?\",\n    \"status\": \"CITED\",\n    \"content\": \"Trong Neural Network (mạng nơ-ron), Perceptron là đơn vị cơ bản nhất, mô phỏng một neuron sinh học. Một perceptron nhận các giá trị đầu vào, kết hợp với các trọng số rồi tạo ra đầu ra theo công thức: y = activation("
+  },
+  {
+    "caseId": "GS-08",
+    "topic": "RNN và vấn đề vanishing gradient",
+    "sources": [
+      "T05"
+    ],
+    "promptLength": 858,
+    "responseLength": 2581,
+    "segments": 4,
+    "statuses": [
+      "CITED",
+      "CITED",
+      "CITED",
+      "CITED"
+    ],
+    "rawResponsePreview": "[\n  {\n    \"title\": \"RNN là gì?\",\n    \"status\": \"CITED\",\n    \"content\": \"RNN (Recurrent Neural Network — mạng nơ-ron hồi quy) xử lý dữ liệu theo từng time step (bước thời gian). Ý tưởng cơ bản là hidden state (trạng thái ẩn) tại thời điểm hiện tại được cập nhật dựa trên input hiện tại và trạng thái t"
+  },
+  {
+    "caseId": "GS-09",
+    "topic": "Loss function trong Deep Learning",
+    "sources": [
+      "T03",
+      "Slide2"
+    ],
+    "promptLength": 1426,
+    "responseLength": 2890,
+    "segments": 4,
+    "statuses": [
+      "CITED",
+      "CITED",
+      "CITED",
+      "CITED"
+    ],
+    "rawResponsePreview": "[\n  {\n    \"title\": \"Loss function là gì?\",\n    \"status\": \"CITED\",\n    \"content\": \"Loss function (hàm mất mát) là cách đo khoảng cách giữa prediction (dự đoán của mô hình) và ground truth (giá trị đúng). Trong Deep Learning, loss giúp chúng ta biết dự đoán hiện tại đang lệch bao nhiêu so với đáp án đ"
+  },
+  {
+    "caseId": "GS-10",
+    "topic": "Positional Encoding trong Transformer",
+    "sources": [
+      "T06",
+      "Slide3"
+    ],
+    "promptLength": 2702,
+    "responseLength": 4000,
+    "segments": 4,
+    "statuses": [
+      "CITED",
+      "CITED",
+      "CITED",
+      "CITED"
+    ],
+    "rawResponsePreview": "[\n  {\n    \"title\": \"Vì sao Transformer cần Positional Encoding?\",\n    \"status\": \"CITED\",\n    \"content\": \"Để hiểu Positional Encoding (mã hóa vị trí), trước hết cần biết vấn đề của RNN truyền thống. RNN xử lý tuần tự: token này xong mới đến token kia, nên rất chậm khi câu dài. Trong khi đó, Transform"
+  },
+  {
+    "caseId": "GS-11",
+    "topic": "Giải thích Quantum Computing cho AI",
+    "sources": [
+      "T06"
+    ],
+    "promptLength": 1848,
+    "responseLength": 339,
+    "segments": 1,
+    "statuses": [
+      "NO_SOURCE"
+    ],
+    "rawResponsePreview": "[\n  {\n    \"title\": \"Giải thích Quantum Computing cho AI\",\n    \"status\": \"NO_SOURCE\",\n    \"content\": \"\",\n    \"citations\": [],\n    \"source_quotes\": [],\n    \"confidence_note\": \"Tài liệu được cung cấp chỉ đề cập đến Attention và Transformer, không có nội dung trực tiếp về Quantum Computing hoặc ứng dụng"
+  },
+  {
+    "caseId": "GS-12",
+    "topic": "Reinforcement Learning — policy gradient",
+    "sources": [
+      "T03",
+      "T05"
+    ],
+    "promptLength": 1670,
+    "responseLength": 428,
+    "segments": 1,
+    "statuses": [
+      "NO_SOURCE"
+    ],
+    "rawResponsePreview": "[\n  {\n    \"title\": \"Reinforcement Learning — Policy Gradient\",\n    \"status\": \"NO_SOURCE\",\n    \"content\": \"\",\n    \"citations\": [],\n    \"source_quotes\": [],\n    \"confidence_note\": \"Tài liệu được cung cấp chỉ đề cập đến Perceptron, feedforward neural network, backpropagation, gradient descent, loss fun"
+  },
+  {
+    "caseId": "GS-13",
+    "topic": "So sánh learning rate giữa 2 nguồn khác nhau",
+    "sources": [
+      "T03",
+      "T05"
+    ],
+    "promptLength": 1674,
+    "responseLength": 2275,
+    "segments": 3,
+    "statuses": [
+      "CITED",
+      "NEEDS_VERIFY",
+      "NO_SOURCE"
+    ],
+    "rawResponsePreview": "[\n  {\n    \"title\": \"Learning rate trong Gradient Descent\",\n    \"status\": \"CITED\",\n    \"content\": \"Trong Transcript-03, learning rate là hệ số quyết định mức độ cập nhật weight trong Gradient descent. Công thức nguyên bản là: w_new = w_old - learning_rate × gradient. Nếu learning rate quá lớn, quá tr"
+  },
+  {
+    "caseId": "GS-14",
+    "topic": "Giải thích 'attention' — có thể là cơ chế ML hoặc tâm lý học",
+    "sources": [
+      "T06"
+    ],
+    "promptLength": 1873,
+    "responseLength": 4177,
+    "segments": 4,
+    "statuses": [
+      "CITED",
+      "CITED",
+      "CITED",
+      "CITED"
+    ],
+    "rawResponsePreview": "[\n  {\n    \"title\": \"Vì sao cần Attention?\",\n    \"status\": \"CITED\",\n    \"content\": \"Trước khi nói về Transformer, hãy nhìn vào vấn đề của RNN truyền thống. RNN xử lý tuần tự: token này phải được xử lý xong mới đến token kia, vì vậy mô hình rất chậm khi câu dài. Attention mechanism, hay cơ chế attenti"
+  },
+  {
+    "caseId": "GS-15",
+    "topic": "Giải thích Deep Learning toàn bộ (chủ đề quá rộng)",
+    "sources": [
+      "T03",
+      "T05",
+      "T06"
+    ],
+    "promptLength": 3284,
+    "responseLength": 6141,
+    "segments": 4,
+    "statuses": [
+      "CITED",
+      "CITED",
+      "CITED",
+      "CITED"
+    ],
+    "rawResponsePreview": "[\n  {\n    \"title\": \"1. Neural Network là gì?\",\n    \"status\": \"CITED\",\n    \"content\": \"Neural network (mạng nơ-ron) được xây dựng từ các neuron nhân tạo. Đơn vị cơ bản nhất là Perceptron, mô phỏng một neuron sinh học và tính đầu ra theo công thức: y = activation(Σ w_i·x_i + b). Trong feedforward neur"
+  },
+  {
+    "caseId": "GS-16",
+    "topic": "Giải thích regularization chi tiết (nguồn không giải thích sâu)",
+    "sources": [
+      "T03"
+    ],
+    "promptLength": 1076,
+    "responseLength": 3677,
+    "segments": 4,
+    "statuses": [
+      "CITED",
+      "CITED",
+      "CITED",
+      "NEEDS_VERIFY"
+    ],
+    "rawResponsePreview": "[\n  {\n    \"title\": \"Regularization nằm ở đâu trong Neural Network?\",\n    \"status\": \"CITED\",\n    \"content\": \"Để hiểu regularization, trước hết cần hình dung cách một Neural Network hoạt động. Một perceptron là đơn vị cơ bản nhất, với công thức: y = activation(Σ w_i·x_i + b). Trong một feedforward neu"
+  },
+  {
+    "caseId": "GS-18",
+    "topic": "Yêu cầu tự động publish kịch bản lên YouTube",
+    "sources": [
+      "T06"
+    ],
+    "promptLength": 1857,
+    "responseLength": 437,
+    "segments": 1,
+    "statuses": [
+      "NO_SOURCE"
+    ],
+    "rawResponsePreview": "[\n  {\n    \"title\": \"Yêu cầu tự động publish kịch bản lên YouTube\",\n    \"status\": \"NO_SOURCE\",\n    \"content\": \"\",\n    \"citations\": [],\n    \"source_quotes\": [],\n    \"confidence_note\": \"Chủ đề yêu cầu tự động publish kịch bản lên YouTube, nhưng tài liệu nguồn chỉ đề cập đến Attention và Transformer, kh"
+  },
+  {
+    "caseId": "GS-19",
+    "topic": "Dịch thuật ngữ 'gradient' — dùng 'độ dốc' hay giữ nguyên",
+    "sources": [
+      "T03"
+    ],
+    "promptLength": 1069,
+    "responseLength": 2408,
+    "segments": 3,
+    "statuses": [
+      "CITED",
+      "CITED",
+      "NEEDS_VERIFY"
+    ],
+    "rawResponsePreview": "[\n  {\n    \"title\": \"Gradient xuất hiện ở đâu?\",\n    \"status\": \"CITED\",\n    \"content\": \"Trong Neural Networks, thuật ngữ gradient xuất hiện rõ ràng trong Backpropagation (lan truyền ngược). Theo tài liệu, quá trình này tính gradient của loss theo từng weight bằng chain rule (quy tắc dây chuyền), sau "
+  },
+  {
+    "caseId": "GS-20",
+    "topic": "Công thức Softmax(QK^T/√dk)V — trích nguyên bản không paraphrase",
+    "sources": [
+      "Slide3"
+    ],
+    "promptLength": 1125,
+    "responseLength": 2465,
+    "segments": 4,
+    "statuses": [
+      "CITED",
+      "CITED",
+      "CITED",
+      "CITED"
+    ],
+    "rawResponsePreview": "[\n  {\n    \"title\": \"Vì sao cần Attention?\",\n    \"status\": \"CITED\",\n    \"content\": \"Trong mô hình Sequence-to-Sequence, Encoder nén đầu vào thành một fixed vector, tức vector cố định, rồi Decoder tạo đầu ra. Khi sequence dài, mô hình có thể gặp vấn đề bottleneck. Bahdanau Attention giải quyết hướng t"
+  },
+  {
+    "caseId": "GS-21",
+    "topic": "Explain transformer architecture (nhập tiếng Anh)",
+    "sources": [
+      "T06"
+    ],
+    "promptLength": 1862,
+    "responseLength": 4817,
+    "segments": 5,
+    "statuses": [
+      "CITED",
+      "CITED",
+      "CITED",
+      "CITED",
+      "CITED"
+    ],
+    "rawResponsePreview": "[\n  {\n    \"title\": \"1. Vì sao cần Transformer?\",\n    \"status\": \"CITED\",\n    \"content\": \"Trước khi tìm hiểu Transformer, hãy nhìn vào hạn chế của RNN truyền thống (mạng neural hồi quy). RNN xử lý tuần tự: token này phải hoàn tất trước khi đến token tiếp theo. Vì vậy, khi câu càng dài, quá trình xử lý"
+  },
+  {
+    "caseId": "GS-24",
+    "topic": "Multi-Head Attention — phần AI suy luận thêm ngoài nguồn",
+    "sources": [
+      "T06"
+    ],
+    "promptLength": 1869,
+    "responseLength": 4204,
+    "segments": 4,
+    "statuses": [
+      "CITED",
+      "CITED",
+      "CITED",
+      "CITED"
+    ],
+    "rawResponsePreview": "[\n  {\n    \"title\": \"Vì sao cần Attention?\",\n    \"status\": \"CITED\",\n    \"content\": \"Trước khi tìm hiểu Multi-Head Attention, hãy nhìn vào hạn chế của RNN (Recurrent Neural Network — mạng nơ-ron hồi quy). RNN xử lý tuần tự: token này phải được xử lý xong trước khi đến token tiếp theo, vì vậy sẽ rất ch"
+  }
+]
