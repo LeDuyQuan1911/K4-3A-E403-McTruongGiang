@@ -591,6 +591,175 @@
             margin-top: 10px;
         }
 
+        .btn-success {
+            background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+            color: #ffffff;
+            border: 1px solid #059669;
+            box-shadow: 0 4px 14px rgba(16, 185, 129, 0.28);
+        }
+
+        .btn-success:hover {
+            background: linear-gradient(135deg, #047857 0%, #059669 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 22px rgba(16, 185, 129, 0.36);
+            filter: brightness(1.04);
+            color: #ffffff;
+        }
+
+        .btn-success:active {
+            transform: translateY(0);
+        }
+
+        /* ==================== REVIEW TOOLBAR ==================== */
+        .review-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #ffffff;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 12px;
+            padding: 12px 18px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+        }
+
+        .review-toolbar-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+            color: #475569;
+            font-weight: 600;
+        }
+
+        .review-toolbar-badge {
+            background: #ecfdf5;
+            border: 1px solid #a7f3d0;
+            color: #047857;
+            padding: 4px 12px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        /* ==================== CONFIRM MODAL ==================== */
+        .confirm-modal-backdrop {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.48);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            animation: fadeInModal 0.2s ease-out;
+        }
+
+        @keyframes fadeInModal {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .confirm-modal-box {
+            background: #ffffff;
+            border-radius: 18px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 20px 45px -10px rgba(15, 23, 42, 0.25), 0 8px 16px -4px rgba(15, 23, 42, 0.12);
+            width: 90%;
+            max-width: 500px;
+            padding: 28px 26px;
+            text-align: center;
+            animation: popModal 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes popModal {
+            from { transform: scale(0.92) translateY(12px); opacity: 0; }
+            to { transform: scale(1) translateY(0); opacity: 1; }
+        }
+
+        .confirm-modal-icon {
+            font-size: 44px;
+            margin-bottom: 12px;
+            display: inline-block;
+            filter: drop-shadow(0 4px 10px rgba(217, 119, 6, 0.25));
+        }
+
+        .confirm-modal-title {
+            font-size: 18.5px;
+            font-weight: 800;
+            color: #0f172a;
+            margin-bottom: 10px;
+            letter-spacing: -0.4px;
+        }
+
+        .confirm-modal-desc {
+            font-size: 13.5px;
+            color: #475569;
+            line-height: 1.6;
+            margin-bottom: 18px;
+        }
+
+        .confirm-modal-stats {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin-bottom: 22px;
+            font-size: 13px;
+            color: #334155;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        .confirm-modal-stats-item {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .confirm-modal-stats-label {
+            font-size: 11px;
+            color: #64748b;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        .confirm-modal-stats-val {
+            font-size: 16px;
+            font-weight: 800;
+        }
+
+        .confirm-modal-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .toast-notify {
+            position: fixed;
+            bottom: 28px;
+            right: 28px;
+            padding: 12px 20px;
+            background: #0f172a;
+            color: #ffffff;
+            font-size: 13px;
+            font-weight: 600;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.22);
+            z-index: 10000;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 0;
+            transform: translateY(15px);
+            pointer-events: none;
+        }
+
+        .toast-notify.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
         /* ==================== BANNERS ==================== */
         .warning-banner {
             background: var(--yellow-bg);
@@ -1630,9 +1799,21 @@
             <h2 class="screen-title">Duyệt kịch bản</h2>
             <p class="screen-subtitle">Xem từng đoạn, kiểm tra nguồn, chấp nhận hoặc sửa. <span class="g-tag">G9</span></p>
             <div class="stats-bar" id="statsBar"></div>
+
+            <div class="review-toolbar" id="reviewToolbar">
+                <div class="review-toolbar-info">
+                    <span>📋 Tiến độ duyệt:</span>
+                    <span class="review-toolbar-badge" id="reviewBadgeText"><strong id="acceptedCountDisplay">0</strong> / <strong id="totalCountDisplay">0</strong> slide đã chấp nhận</span>
+                </div>
+                <div class="review-toolbar-actions">
+                    <button class="btn btn-success" id="btnTopAcceptAll" onclick="acceptAllSegments()">✓ Chấp nhận tất cả</button>
+                </div>
+            </div>
+
             <div id="segmentsContainer"></div>
             <div class="btn-row">
                 <button class="btn btn-secondary" onclick="goToScreen(2)">← Chọn lại nguồn</button>
+                <button class="btn btn-success" onclick="acceptAllSegments()">✓ Chấp nhận tất cả</button>
                 <button class="btn btn-primary" onclick="goToExport()">Tiếp → Xuất kịch bản</button>
             </div>
         </div>
@@ -1661,6 +1842,38 @@
     </div>
     </div>
     <button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()">📜</button>
+
+    <!-- Alert / Confirmation Modal khi chưa chấp nhận tất cả script -->
+    <div class="confirm-modal-backdrop" id="confirmModalBackdrop">
+        <div class="confirm-modal-box">
+            <div class="confirm-modal-icon">⚠️</div>
+            <h3 class="confirm-modal-title">Bạn chưa duyệt hết kịch bản!</h3>
+            <p class="confirm-modal-desc">
+                Bạn chưa đọc hết hoặc chưa bấm chấp nhận toàn bộ các slide kịch bản. Bạn có muốn <strong>chấp nhận tất cả các slide còn lại</strong> (ngoại trừ các slide bạn đã bấm bỏ) để xuất kịch bản không?
+            </p>
+            <div class="confirm-modal-stats">
+                <div class="confirm-modal-stats-item">
+                    <span class="confirm-modal-stats-label">Đã duyệt</span>
+                    <span class="confirm-modal-stats-val" id="modalAcceptedCount" style="color:var(--green)">0</span>
+                </div>
+                <div class="confirm-modal-stats-item">
+                    <span class="confirm-modal-stats-label">Chưa duyệt</span>
+                    <span class="confirm-modal-stats-val" id="modalPendingCount" style="color:var(--yellow)">0</span>
+                </div>
+                <div class="confirm-modal-stats-item">
+                    <span class="confirm-modal-stats-label">Đã bỏ</span>
+                    <span class="confirm-modal-stats-val" id="modalRejectedCount" style="color:var(--red)">0</span>
+                </div>
+            </div>
+            <div class="confirm-modal-actions">
+                <button class="btn btn-secondary" onclick="closeConfirmModal()">🔍 Quay lại đọc tiếp</button>
+                <button class="btn btn-success" onclick="confirmAcceptAllAndExport()">✓ Chấp nhận tất cả & Xuất</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast-notify" id="toastNotification"></div>
 
     <script>
         let currentScreen = 1, aiSegments = [], traceLog = [], sfHistory = [], activeHistoryId = null;
@@ -1788,16 +2001,158 @@
                     </div>
                 </div>`;
             });
+            updateReviewProgress();
         }
 
-        function acceptSeg(b, g) { resetBtns(g); b.classList.add('accepted'); b.textContent = '✓ Đã chấp nhận'; }
-        function enableEdit(i) { const t = document.getElementById(`segText${i}`); if (t) { t.contentEditable = true; t.classList.add('editable'); t.focus(); } const a = document.getElementById(`a${i}`); if (a) { a.querySelectorAll('.seg-btn').forEach(b => b.classList.remove('accepted','rejected','editing')); const e = a.querySelector('.seg-btn-edit'); if (e) { e.classList.add('editing'); e.textContent = '✏ Đang sửa...'; } } }
-        function rejectSeg(b, g) { resetBtns(g); b.classList.add('rejected'); b.textContent = '✗ Đã bỏ'; b.closest('.segment').style.opacity = '0.4'; }
-        function resetBtns(g) { const el = document.getElementById(g); if (!el) return; el.querySelectorAll('.seg-btn').forEach(b => b.classList.remove('accepted','rejected','editing')); el.closest('.segment').style.opacity = '1'; }
-        function toggleCitation(el) { el.closest('.segment-body').querySelectorAll('.segment-source').forEach(s => s.classList.toggle('show')); }
+        function acceptSeg(b, g) {
+            resetBtns(g);
+            b.classList.add('accepted');
+            b.textContent = '✓ Đã chấp nhận';
+            updateReviewProgress();
+        }
+
+        function enableEdit(i) {
+            const t = document.getElementById(`segText${i}`);
+            if (t) {
+                t.contentEditable = true;
+                t.classList.add('editable');
+                t.focus();
+            }
+            const a = document.getElementById(`a${i}`);
+            if (a) {
+                a.querySelectorAll('.seg-btn').forEach(b => b.classList.remove('accepted','rejected','editing'));
+                const e = a.querySelector('.seg-btn-edit');
+                if (e) {
+                    e.classList.add('editing');
+                    e.textContent = '✏ Đang sửa...';
+                }
+            }
+            updateReviewProgress();
+        }
+
+        function rejectSeg(b, g) {
+            resetBtns(g);
+            b.classList.add('rejected');
+            b.textContent = '✗ Đã bỏ';
+            b.closest('.segment').style.opacity = '0.4';
+            updateReviewProgress();
+        }
+
+        function resetBtns(g) {
+            const el = document.getElementById(g);
+            if (!el) return;
+            el.querySelectorAll('.seg-btn').forEach(b => b.classList.remove('accepted','rejected','editing'));
+            el.closest('.segment').style.opacity = '1';
+            updateReviewProgress();
+        }
+
+        function toggleCitation(el) {
+            el.closest('.segment-body').querySelectorAll('.segment-source').forEach(s => s.classList.toggle('show'));
+        }
+
+        function updateReviewProgress() {
+            if (!aiSegments || !aiSegments.length) return;
+            let accepted = 0;
+            let active = 0;
+            aiSegments.forEach((s, i) => {
+                const el = document.getElementById(`segment${i}`);
+                if (!el || el.style.opacity === '0.4') return;
+                if (s.status === 'NO_SOURCE') return;
+                active++;
+                const aBox = document.getElementById(`a${i}`);
+                const accBtn = aBox ? aBox.querySelector('.seg-btn-accept') : null;
+                if (accBtn && accBtn.classList.contains('accepted')) {
+                    accepted++;
+                }
+            });
+            const accEl = document.getElementById('acceptedCountDisplay');
+            const totEl = document.getElementById('totalCountDisplay');
+            if (accEl) accEl.textContent = accepted;
+            if (totEl) totEl.textContent = active;
+        }
+
+        function acceptAllSegments() {
+            let count = 0;
+            aiSegments.forEach((s, i) => {
+                const el = document.getElementById(`segment${i}`);
+                if (!el || el.style.opacity === '0.4') return; // Không can thiệp các slide đã bị bỏ
+                const aBox = document.getElementById(`a${i}`);
+                if (aBox) {
+                    const accBtn = aBox.querySelector('.seg-btn-accept');
+                    if (accBtn) {
+                        resetBtns(`a${i}`);
+                        accBtn.classList.add('accepted');
+                        accBtn.textContent = '✓ Đã chấp nhận';
+                        count++;
+                    }
+                }
+            });
+            updateReviewProgress();
+            showToast(`✓ Đã chấp nhận toàn bộ ${count} slide kịch bản!`);
+        }
 
         function goToExport() {
-            goToScreen(5); let text = '', refs = [], acc = 0, rej = 0;
+            let accepted = 0;
+            let unaccepted = 0;
+            let rejected = 0;
+
+            aiSegments.forEach((s, i) => {
+                const el = document.getElementById(`segment${i}`);
+                if (!el) return;
+                if (el.style.opacity === '0.4') {
+                    rejected++;
+                    return;
+                }
+                if (s.status === 'NO_SOURCE') {
+                    const t = document.getElementById(`segText${i}`);
+                    if (!t || !t.textContent.trim() || t.textContent.includes('[Không sinh]')) {
+                        return; // Bỏ qua đoạn rỗng không nguồn
+                    }
+                }
+                const aBox = document.getElementById(`a${i}`);
+                const accBtn = aBox ? aBox.querySelector('.seg-btn-accept') : null;
+                if (accBtn && accBtn.classList.contains('accepted')) {
+                    accepted++;
+                } else {
+                    unaccepted++;
+                }
+            });
+
+            // Nếu còn slide chưa chấp nhận -> hiển thị Alert / Modal hỏi người dùng
+            if (unaccepted > 0) {
+                showConfirmModal(accepted, unaccepted, rejected);
+                return;
+            }
+
+            // Đã chấp nhận hết -> Xuất ngay
+            executeExport();
+        }
+
+        function showConfirmModal(accepted, unaccepted, rejected) {
+            const accEl = document.getElementById('modalAcceptedCount');
+            const penEl = document.getElementById('modalPendingCount');
+            const rejEl = document.getElementById('modalRejectedCount');
+            if (accEl) accEl.textContent = accepted;
+            if (penEl) penEl.textContent = unaccepted;
+            if (rejEl) rejEl.textContent = rejected;
+            const modal = document.getElementById('confirmModalBackdrop');
+            if (modal) modal.style.display = 'flex';
+        }
+
+        function closeConfirmModal() {
+            const modal = document.getElementById('confirmModalBackdrop');
+            if (modal) modal.style.display = 'none';
+        }
+
+        function confirmAcceptAllAndExport() {
+            acceptAllSegments();
+            closeConfirmModal();
+            executeExport();
+        }
+
+        function executeExport() {
+            goToScreen(5);
+            let text = '', refs = [], acc = 0, rej = 0;
             aiSegments.forEach((s, i) => {
                 const el = document.getElementById(`segment${i}`);
                 if (el && el.style.opacity === '0.4') { rej++; return; }
@@ -1825,6 +2180,17 @@
             document.getElementById('exportPreview').textContent = text;
             document.getElementById('exportRefs').innerHTML = '<h4>📚 Nguồn trích dẫn</h4>' + refs.map(r => `<div class="ref-item ${r.status === 'NEEDS_VERIFY' ? 'warning' : ''}">• [${r.id}] ${r.quote} ${r.status === 'NEEDS_VERIFY' ? '⚠ cần xác minh' : ''}</div>`).join('');
             document.getElementById('exportStats').innerHTML = `<div class="stat-item"><div class="stat-value" style="color:var(--accent)">${acc}</div><div class="stat-label">Đoạn duyệt</div></div><div class="stat-item"><div class="stat-value green">${refs.length}</div><div class="stat-label">Trích dẫn</div></div><div class="stat-item"><div class="stat-value red">${rej}</div><div class="stat-label">Bị bỏ</div></div>`;
+        }
+
+        function showToast(msg) {
+            const t = document.getElementById('toastNotification');
+            if (!t) return;
+            t.textContent = msg;
+            t.classList.add('show');
+            clearTimeout(window.__toastTimer);
+            window.__toastTimer = setTimeout(() => {
+                t.classList.remove('show');
+            }, 2800);
         }
 
         function showFullLog() { const c = document.getElementById('fullLogCard'); c.hidden = !c.hidden; if (!c.hidden) document.getElementById('fullLogPanel').innerHTML = traceLog.map(e => `<div class="log-entry"><span class="log-timestamp">[${e.ts}]</span> <span class="${e.isError ? 'log-error' : 'log-label'}">[${e.label}]</span> ${e.message}</div>`).join(''); }
@@ -1994,6 +2360,14 @@
             document.getElementById('sidebar').classList.toggle('open');
             document.getElementById('sidebarOverlay').classList.toggle('open');
         }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeConfirmModal();
+        });
+        window.addEventListener('click', (e) => {
+            const backdrop = document.getElementById('confirmModalBackdrop');
+            if (e.target === backdrop) closeConfirmModal();
+        });
 
         window.addEventListener('load', () => { setTimeout(testConnection, 400); loadHistory(); });
     </script>
