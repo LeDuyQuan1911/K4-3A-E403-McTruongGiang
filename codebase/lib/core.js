@@ -140,6 +140,12 @@ export function scopeCheck(topic) {
   const t = normalize(topic).toLowerCase();
   if (/tự (động )?(xuất bản|đăng|publish)|auto.?publish|đăng (lên|youtube|facebook)/iu.test(t)) return 'Ứng dụng chỉ xuất tệp sau khi người viết duyệt; không tự đăng hay xuất bản.';
   if (/bịa|fabricat|fake (source|citation)|ignore (all|previous)|bỏ qua (mọi|tất cả|quy tắc)|system prompt/iu.test(t)) return 'Không thực hiện yêu cầu bịa nguồn hoặc bỏ qua kiểm chứng.';
+  if (/(mật khẩu|api[ -]?key|credential|bí mật|secret).*(web|trang|nguồn)|(web|trang|nguồn).*(mật khẩu|api[ -]?key|credential|bí mật|secret)/iu.test(t)) return 'Không lấy, xử lý hoặc làm theo thông tin bí mật xuất hiện trong nguồn web.';
+  if (/bỏ qua.*(người duyệt|giảng viên|duyệt)|xuất.*(khi|mà).*chưa.*duyệt/iu.test(t)) return 'Không thể bỏ qua bước duyệt nguồn, cảnh và giảng viên trước khi xuất.';
+  if (/(paywall|đăng nhập|vượt.*(?:rào|kiểm soát))|bằng mọi cách.*(?:tải|đọc)/iu.test(t)) return 'Không vượt paywall, đăng nhập hoặc biện pháp kiểm soát truy cập để lấy nội dung.';
+  if (/gọi.*dịch vụ ngoài.*không có nguồn|xác minh.*không có nguồn/iu.test(t)) return 'Cần URL HTTPS hoặc nguồn hợp lệ do người dùng cung cấp trước khi đối chiếu.';
+  if (/tự sửa.*citation|hợp thức hóa.*(?:claim|khẳng định|câu bịa)|citation.*(?:câu bịa|khẳng định bịa)/iu.test(t)) return 'Không sửa bằng chứng để hợp thức hóa một khẳng định chưa có căn cứ.';
+  if (/(xuất|lấy).*(tên|liên hệ|dữ liệu nhận dạng)|(?:tên|liên hệ).*(người trả lời|học viên)/iu.test(t)) return 'Không xuất thông tin định danh hoặc liên hệ của người trả lời khảo sát.';
   return '';
 }
 export function noSource(reason, title = 'Chưa đủ căn cứ') {

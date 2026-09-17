@@ -19,7 +19,8 @@
 ├── README.md              # Thông tin nhóm + phân công
 ├── spec.md                # AI Spec (deliverable trung tâm)
 ├── eval/                  # Golden set + kết quả kiểm thử
-│   ├── golden-set.csv     # ≥20 test case
+│   ├── golden-set.csv     # 50 test case đã chốt
+│   ├── golden-results.csv # Bảng Pass/Fail tái lập cho từng case (fixture)
 │   └── results.md         # Bảng kết quả các lượt chạy
 ├── codebase/              # Source code prototype
 │   └── README.md          # Hướng dẫn chạy prototype
@@ -51,6 +52,6 @@ Xem [hướng dẫn chạy, đổi API và giới hạn](codebase/README.md). `n
 - [ ] **CP1** (19:30 16/9) — Canvas + repo + willing user
 - [ ] **CP2** (21:00 16/9) — Luồng hoạt động bấm được
 - [ ] **CP3** (16:00 17/9) — Video 30s AI chạy thật + số đo
-- [ ] **CP4** (21:00 17/9) — Chốt spec.md
+- [x] **CP4** (21:00 17/9) — Chốt spec, evidence ẩn danh, golden set 50 ca và kết quả regression
 - [ ] **CP5** (13:00 18/9) — Slide PDF + video demo dự phòng
 - [ ] **CP6** (17:30 18/9) — Thuyết trình

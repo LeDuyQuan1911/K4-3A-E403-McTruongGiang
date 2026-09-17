@@ -9,6 +9,7 @@
     "dev": "node --env-file-if-exists=.env --watch codebase/server.js",
     "test": "node --test codebase/tests/*.test.js",
     "eval": "node codebase/eval.js",
+    "eval:golden": "node codebase/eval.js",
     "doctor": "node --env-file-if-exists=.env codebase/doctor.js",
     "check:api": "node --env-file-if-exists=.env codebase/doctor.js --live",
     "check:search": "node --env-file-if-exists=.env codebase/doctor.js --search"
