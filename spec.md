@@ -81,12 +81,12 @@ Loại: [x] Tính năng mới
 | Vai trò | Người | Việc cụ thể |
 |---|---|---|
 | Spec + Evidence | Nguyễn Lê Phúc Thắng, Vũ Minh Hoàng | Viết spec, phỏng vấn Studio team, mining data |
-| Prototype | Lê Duy Quân, Bùi Trọng Trịnh | Code RAG pipeline + UI |
+| Prototype | Lê Duy Quân, Bùi Trọng Trịnh, Nguyễn Lê Phúc Thắng | Code RAG pipeline + UI |
 | AI Call | Bùi Trọng Trịnh, Nguyễn Lê Phúc Thắng | Prompt engineering, citation format |
 | Eval | Lê Duy Quân, Nguyễn Lê Phúc Thắng | Golden set ≥20 case, chạy đo |
-| Validation/Demo | Vũ Minh Hoàng, Lê Duy Quân | User test, slide, video demo |
+| Validation/Demo | Vũ Minh Hoàng, Lê Duy Quân, Bùi Trọng Trịnh | User test, slide, video demo |
 
-- **Willing users:** mã ẩn danh P01–P04 (hai coach và hai người học). Danh tính/liên hệ không lưu trong Git.
+- **Willing users:** mã ẩn danh P01–P04 (hai Lab coach và hai Học viên). Danh tính/liên hệ không lưu trong Git.
 
 ## §9. Changelog
 | Thời điểm | Đổi gì | Vì sao |
