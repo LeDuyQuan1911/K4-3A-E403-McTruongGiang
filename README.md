@@ -8,7 +8,7 @@
 
 | Họ và Tên | Mã Học Viên | Vai trò chính | Phần việc đảm nhiệm trong dự án |
 |---|---|---|---|
-| **Lê Duy Quân** | _(điền MSSV)_ | Nhóm trưởng · Lead & Eval | Kiến trúc tổng thể, bộ kiểm thử Golden Set (24 cases), review logic UI/UX |
+| **Lê Duy Quân** | `2A202602731` | Nhóm trưởng · Lead & Eval | Kiến trúc tổng thể, bộ kiểm thử Golden Set (24 cases), review logic UI/UX |
 | **Bùi Trọng Trịnh** | _(điền MSSV)_ | Dev · Backend & RAG | RAG prompt engineering, tính toán thời lượng video ~130 wpm, API proxy |
 | **Nguyễn Lê Phúc Thắng** | _(điền MSSV)_ | Dev & Evidence | Khảo sát người dùng (20 người), phân tích mining data, luồng duyệt kịch bản |
 | **Vũ Minh Hoàng** | _(điền MSSV)_ | Validation & Presentation | Thu thập feedback người dùng thật (Bonus R6), chuẩn bị Slide PDF và Video demo |
