@@ -1,4 +1,5 @@
 # AI SPEC — Research-to-Script: AI nghiên cứu nguồn → draft kịch bản có trích dẫn · Nhóm Lê Duy Quân · Lớp 3A
+> Cập nhật 17/09: thiết kế triển khai hiện hành ở **§10** và `docs/c3-compliance.md`, được ưu tiên khi khác với mô tả prototype ban đầu bên dưới. Các số khảo sát “gần 20”, “>90%” trong bản gốc chưa có log minh chứng trong repo; chưa coi là bằng chứng đã xác minh.
 Hướng: [x] C — Lesson Studio · Đề C3
 Loại: [x] Tính năng mới
 
@@ -93,4 +94,16 @@ Loại: [x] Tính năng mới
 |---|---|---|
 | 16/9 19:30 | Tạo Canvas CP1, chọn Track C3 | Khảo sát ~20 người, >90% xác nhận cần công cụ tìm nguồn |
 | 16/9 20:00 | Mock prototype 5 bước + spec §4, §6 (CP2) | Thiết kế luồng trải nghiệm trước khi code |
-
+
+## §10. Thiết kế hiện hành theo nguyên văn C3
+
+- Đầu vào đủ bốn trường: chủ đề, mục tiêu học tập, người học, thời lượng. Không yêu cầu cấp transcript/slide trước. Agent tìm URL bằng Tavily hoặc OpenAI Web Search, tải trang HTML thật, đánh giá theo tiêu chí công khai và chờ người dùng duyệt nguồn.
+- Lát cắt: năm câu mở đầu tiếng Việt; mỗi câu một cảnh với lời, chữ trên màn hình, ý đồ hình và claim ID. Không phải toàn bộ video. Nguồn ngoại ngữ được hỗ trợ; bản dịch phải đối chiếu.
+- Model viết mặc định DeepSeek; đổi OpenAI/Gemini/endpoint tương thích bằng `.env`. Tìm kiếm độc lập với model viết. Không dùng model để tự bịa danh sách URL khi thiếu dịch vụ tìm kiếm; thêm URL thủ công là đường dự phòng và không đủ thay demo tự tìm nguồn.
+- Mỗi trích đoạn phải khớp chính xác bản văn bản đã tải (chuẩn hóa Unicode/khoảng trắng). CITED chỉ là khớp nguyên văn, không chứng minh ý nghĩa đúng; paraphrase luôn NEEDS_VERIFY. NO_SOURCE không được chấp nhận. Số liệu cần ít nhất hai nhóm nguồn và người duyệt xác nhận độc lập/ngữ cảnh.
+- Đổi/bỏ nguồn chỉ làm mất hiệu lực câu phụ thuộc. Chỉnh câu hủy quyết định duyệt cũ. Thêm nguồn có mâu thuẫn liên quan mở lại lượt duyệt. Export bị chặn khi còn nguồn/câu chờ duyệt, thiếu bằng chứng hoặc chưa có xác nhận giảng viên.
+- Dữ liệu web luôn là dữ liệu không tin cậy, không phải chỉ dẫn. Có cách ly lệnh ẩn theo mẫu, chặn URL mạng riêng, kiểm tra robots/noai/paywall, không thực thi JavaScript website. Các cơ chế heuristic vẫn cần người biên soạn kiểm tra.
+- Xuất Markdown, JSON kịch bản theo schema ban tổ chức, hồ sơ nguồn, trace nguồn–câu và audit. Bộ thử giả có nhãn riêng, không được dùng làm bằng chứng model thật.
+- 48 kiểm thử phần mềm đã qua. Một lời gọi DeepSeek thật với evidence rỗng đã xác nhận kết nối và JSON hợp lệ; chi tiết ở `eval/results.md`. Golden set dự thảo: `eval/golden-set.md`; chưa có số đo chất lượng model trên brief thật, phỏng vấn mới hay user acceptance. Giữ mục tiêu chất lượng ở §7, chưa tuyên bố đạt các ngưỡng.
+- Hướng dẫn chạy, đổi API, chi phí và giới hạn: `codebase/README.md`. Đối chiếu đầy đủ và phần còn thiếu: `docs/c3-compliance.md`.
+

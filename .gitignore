@@ -22,3 +22,10 @@ venv/
 dist/
 build/
 *.log
+
+# Local documents, drafts, and audit events
+codebase/data/
+test-output/
+
+# Organizer material is local-only; never publish the supplied data pack.
+/Yêu cầu/

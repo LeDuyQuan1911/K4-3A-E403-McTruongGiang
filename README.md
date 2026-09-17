@@ -33,7 +33,18 @@
 
 ## 🚀 Hướng dẫn chạy
 
-> _Cập nhật sau khi có prototype_
+Yêu cầu Node.js ≥22.13. Chạy tại thư mục gốc:
+
+```powershell
+npm install
+npm start
+```
+
+Mở [http://127.0.0.1:3000](http://127.0.0.1:3000). Bộ thử minh họa không cần khóa.
+
+Để dùng DeepSeek thật, sao chép `.env.example` thành `.env` nếu chưa có, đặt `AI_PROVIDER=deepseek` và điền `DEEPSEEK_API_KEY`. Tìm web tự động khuyến nghị `SEARCH_PROVIDER=exa` + `EXA_API_KEY`; nếu chưa có, chọn `SEARCH_PROVIDER=manual` rồi thêm URL nguồn. Có thể đổi riêng model viết và dịch vụ tìm nguồn qua cấu hình, không sửa mã nguồn. Sau khi đổi `.env`, khởi động lại máy chủ.
+
+Xem [hướng dẫn chạy, đổi API và giới hạn](codebase/README.md). `npm run doctor` kiểm tra cấu hình; `npm test` kiểm tra tự động. Chưa có kết quả đánh giá AI thật khi chưa cấu hình khóa.
 
 ## 📅 Tiến độ checkpoint
 
