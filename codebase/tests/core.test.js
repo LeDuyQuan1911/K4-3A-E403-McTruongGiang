@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { chunkText, createSource, retrieve, validateSegment, normalizeScene, reviewScene, invalidateSource, buildExports, sceneIssues, scopeCheck, isNumeric, spellNumbersForSpeech, formatNarrationForSpeech } from '../lib/core.js';
+import { chunkText, createSource, retrieve, validateSegment, normalizeScene, reviewScene, invalidateSource, buildExports, sceneIssues, scopeCheck, isNumeric, spellNumbersForSpeech, formatNarrationForSpeech, fitSlideBullets, clipScreenText, citationValidationIssue } from '../lib/core.js';
 import { parsePage, checkURL, publicIPv4, publisherFor, injectionPattern } from '../lib/web.js';
 import { Studio, potentialConflicts } from '../lib/service.js';
 import { AI } from '../lib/ai.js';
@@ -26,6 +26,10 @@ test('empty and very short citations are rejected',()=>{
 test('paraphrase remains NEEDS_VERIFY even when model requests CITED',()=>assert.equal(validateSegment({...raw,text:'Mô hình tìm quy luật trong dữ liệu.'},candidates).status,'NEEDS_VERIFY'));
 test('whitespace differences do not create fake mismatches',()=>assert.equal(validateSegment({...raw,citations:[{chunkId:'S1-001',quote:text.replaceAll(' ','\n')}]},candidates).status,'CITED'));
 test('one bad citation invalidates the whole sentence',()=>assert.equal(validateSegment({...raw,citations:[...raw.citations,{chunkId:'BAD',quote:text}]},candidates).status,'NO_SOURCE'));
+test('citation validation reports an invalid model citation without weakening exact matching',()=>{
+ assert.match(citationValidationIssue({...raw,citations:[{chunkId:'S1-001',quote:'Đoạn tóm tắt không hề có trong nguồn gốc.'}]},candidates),/không khớp/i);
+ assert.equal(citationValidationIssue(raw,candidates),'');
+});
 test('unverified uploaded content is not retrieved',()=>{
  const s=createSource({title:'test',publisher:'test',text,locator:'dòng 1',rights:'tự tạo',consent:true});assert.equal(retrieve([s],'mô hình dữ liệu').length,0);
 });
@@ -53,7 +57,7 @@ test('rechecking a quarantined source uses the current detector and requires a n
  const p={id:'project',mode:'live',brief:{topic:'Kỹ thuật prompt cho trí tuệ nhân tạo',goal:'Hiểu chỉ dẫn rõ ràng'},sources:[{id:'SOLD',url:'https://developers.openai.com/prompt',decision:'quarantined',chunks:[]}],scenes:[],conflicts:[],audit:[],teacherApproval:null};
  await studio.recheckSource(p,'SOLD');
  assert.equal(p.sources[0].id,'SOLD');assert.equal(p.sources[0].decision,'pending');assert.equal(p.sources[0].provenance.verified,true);assert.ok(p.sources[0].chunks.every(chunk=>chunk.id.startsWith('SOLD-')));
- assert.equal(p.audit.at(-1).event,'source.rechecked');
+ assert.equal(p.audit.length,0);
 });
 test('legitimate body text is escaped by UI, not treated as markup during extraction',()=>{
  const s=parsePage(`<html><title>Test safe source</title><main><p>${text.repeat(4)}</p><script>alert('x')</script></main></html>`,'https://example.org');assert.ok(!s.text.includes('alert'));
@@ -79,42 +83,81 @@ test('unsafe protocols, credentials, ports and fixture domains are rejected befo
 });
 test('Google sub-brands are not counted as independent publishers',()=>assert.equal(publisherFor('research.google').group,publisherFor('ai.google').group));
 test('lookalike publisher suffix is not trusted',()=>assert.equal(publisherFor('nist.gov.evil.com').known,false));
-test('scene schema checks digits, abbreviations and screen width while allowing a multi-sentence teaching scene',()=>{
- const issues=sceneIssues({text:'AI học 12 mẫu. Sau đó suy luận.',slideBullets:['Ý một','Ý hai'],screenText:'x'.repeat(101),visual:''});assert.equal(issues.length,4);
+test('scene schema permits digits but checks abbreviations and screen width',()=>{
+ const issues=sceneIssues({text:'AI học 12 mẫu. Sau đó suy luận.',slideBullets:['Ý một','Ý hai'],screenText:'x'.repeat(101),visual:''});assert.equal(issues.length,3);
+});
+test('AI display cleanup wraps long bullets and clips an overlong screen message without dropping slide items',()=>{
+ const bullets=fitSlideBullets(['Một ý dài '.repeat(20),'Ý thứ hai']);assert.equal(bullets.length,3);assert.ok(bullets.every(item=>item.length<=120));
+ assert.ok(clipScreenText('Thông điệp '.repeat(20)).length<=100);
 });
 test('accept requires an explicit human verification',()=>assert.throws(()=>reviewScene(normalizeScene(raw,candidates,1),{action:'accept'}),/xác nhận/));
 test('edited sentence loses acceptance and must be checked again',()=>{
  const s=reviewScene(normalizeScene(raw,candidates,1),{action:'accept',verified:true});const edited=reviewScene(s,{action:'edit',text:'Mô hình dùng dữ liệu để học.',slideBullets:'Dữ liệu đầu vào\nQuy luật được học',screenText:'Học',visual:'Thẻ đi vào hộp.'});assert.equal(edited.decision,'pending');assert.equal(edited.humanVerified,false);assert.equal(edited.status,'NEEDS_VERIFY');
 });
-test('uncorroborated numbers cannot be accepted',()=>{
+test('AI scene rewrite is limited to existing evidence and requires review again',async()=>{
+ const scene=normalizeScene({...raw,slideBullets:['Ý '.repeat(80),'Quy luật được học']},candidates,1);
+ const ai={enabled:true,draft:async(_brief,received)=>{
+   assert.deepEqual(received.map(item=>item.id),['S1-001']);
+   return {scenes:[{...raw,slideBullets:['Dữ liệu đầu vào','Quy luật được học']}],conflicts:[]};
+ }};
+ const p={id:'P1',mode:'live',brief,sources:[],scenes:[scene],conflicts:[],failures:[],audit:[],teacherApproval:null};
+ const studio=new Studio(memory(),{ai});studio.candidates=()=>candidates;
+ await studio.rewriteScene(p,scene.id);
+ assert.equal(p.scenes[0].decision,'pending');assert.equal(p.scenes[0].humanVerified,false);
+ assert.ok(p.scenes[0].slideBullets.every(item=>item.length<=120));
+ assert.equal(p.audit.length,0);
+});
+test('AI scene rewrite retries a malformed citation and can recover a blocked scene from approved evidence',async()=>{
+ let calls=0;
+ const ai={enabled:true,draft:async(_brief,received,_trace,request)=>{
+   calls++;
+   assert.deepEqual(received.map(item=>item.id),['S1-001']);
+   if(calls===1) return {scenes:[{...raw,citations:[{chunkId:'S1-001',quote:'Bằng chứng bị tóm tắt nên không có trong đoạn nguồn.'}]}],conflicts:[]};
+   assert.ok(request.feedback.some(item=>item.includes('Trích dẫn vừa trả về không khớp evidence')));
+   return {scenes:[raw],conflicts:[]};
+ }};
+ const blocked={...normalizeScene({...raw,citations:[{chunkId:'S1-001',quote:'Bằng chứng bị tóm tắt nên không có trong đoạn nguồn.'}]},candidates,1),id:'blocked'};
+ const p={id:'P1',mode:'live',brief,sources:[],scenes:[blocked],conflicts:[],failures:[],audit:[],teacherApproval:null};
+ const studio=new Studio(memory(),{ai});studio.candidates=()=>candidates;
+ await studio.rewriteScene(p,'blocked');
+ assert.equal(calls,2);assert.notEqual(p.scenes[0].status,'NO_SOURCE');assert.equal(p.scenes[0].text,text);
+});
+test('a cited numeric example can be accepted after human verification',()=>{
  const numericText='Mô hình đạt chín mươi hai phần trăm độ chính xác trong bộ mẫu quan sát.';
  const numericCandidates=[{...candidates[0],text:numericText}];
- const s=normalizeScene({...raw,text:numericText,claimType:'statistic',citations:[{chunkId:'S1-001',quote:numericText}]},numericCandidates,1);assert.equal(s.status,'NEEDS_VERIFY');assert.throws(()=>reviewScene(s,{action:'accept',verified:true,independent:true}),/độc lập/);
+ const s=normalizeScene({...raw,text:numericText,claimType:'statistic',citations:[{chunkId:'S1-001',quote:numericText}]},numericCandidates,1);assert.equal(s.status,'CITED');assert.equal(reviewScene(s,{action:'accept',verified:true}).decision,'accepted');
 });
 
 test('a model statistic label alone does not turn a qualitative teaching scene into a two-source metric',()=>{
  const s=normalizeScene({...raw,claimType:'statistic'},candidates,1);assert.equal(s.claimType,'concept');
 });
+test('tutorial outputs and code versions are not classified as a two-source empirical metric',()=>{
+ assert.equal(isNumeric('TensorFlow in final train loss: 0.177; final test loss: 0.157.'),false);
+ assert.equal(isNumeric('Chuyển dữ liệu sang float32.'),false);
+});
 test('qualitative advice mentioning token cost is not a metric, while a measured percentage remains one',()=>{
  assert.equal(isNumeric('Cân nhắc chi phí thời gian và token trước khi chọn kỹ thuật.'),false);
  assert.equal(isNumeric('Kết quả đạt chín mươi hai phần trăm độ chính xác.'),true);
+ assert.equal(isNumeric('Kiểu dữ liệu float32 dùng để tính toán.'),false);
+ assert.equal(isNumeric('Kết quả đạt 92% độ chính xác.'),true);
 });
-test('numeric speech formatting changes only the way a value is read',()=>{
+test('numeric speech formatting helper is available but the script keeps its original numbers',()=>{
  assert.equal(spellNumbersForSpeech('14 kỹ thuật, 92% và 2.5 giây.'),'mười bốn kỹ thuật, chín mươi hai phần trăm và hai phẩy năm giây.');
+ assert.equal(formatNarrationForSpeech('14 kỹ thuật, 92% và float32.'),'14 kỹ thuật, 92% và float32.');
 });
 test('speech formatting expands common abbreviations and a GPT version without changing its value',()=>{
- assert.equal(formatNarrationForSpeech('Model GPT-4 dùng AI qua API.'),'mô hình tạo sinh đã được huấn luyện trước, phiên bản bốn dùng trí tuệ nhân tạo qua giao diện lập trình ứng dụng.');
+ assert.equal(formatNarrationForSpeech('Model GPT-4 dùng AI qua API.'),'mô hình tạo sinh đã được huấn luyện trước, phiên bản 4 dùng trí tuệ nhân tạo qua giao diện lập trình ứng dụng.');
 });
-test('a reviewer can attach a selected approved independent excerpt to a statistical scene',async()=>{
+test('a reviewer can attach a selected approved excerpt to a numerical scene',async()=>{
  const numericText='Mô hình đạt chín mươi hai phần trăm độ chính xác trong bộ mẫu quan sát.';
  const first={id:'S1',title:'Nghiên cứu A',publisher:'Tổ chức A',publisherGroup:'org-a',url:'https://a.example.org',locator:'Bản gốc A',decision:'approved',provenance:{verified:true},chunks:[{id:'S1-001',text:numericText,locator:'Dòng 1'}]};
  const second={id:'S2',title:'Nghiên cứu B',publisher:'Tổ chức B',publisherGroup:'org-b',url:'https://b.example.org',locator:'Bản gốc B',decision:'approved',provenance:{verified:true},chunks:[{id:'S2-001',text:'Đánh giá độc lập cũng báo cáo chín mươi hai phần trăm độ chính xác trong cùng phạm vi đo.',locator:'Dòng 2'}]};
  const scene=normalizeScene({...raw,text:numericText,citations:[{chunkId:'S1-001',quote:numericText}]},[{...first.chunks[0],sourceId:first.id,title:first.title,publisher:first.publisher,publisherGroup:first.publisherGroup,url:first.url,sourceLocator:first.locator}],1);
  const p={id:'P1',mode:'demo',brief,sources:[first,second],scenes:[scene],conflicts:[],failures:[],audit:[],teacherApproval:null};
  const studio=new Studio(memory());
- await assert.rejects(studio.attachEvidence(p,scene.id,{chunkIds:['S1-001']}),/tổ chức độc lập/);
+ await studio.attachEvidence(p,scene.id,{chunkIds:['S1-001']});
  await studio.attachEvidence(p,scene.id,{chunkIds:['S2-001']});
- assert.deepEqual(scene.independentGroups,['org-a','org-b']);assert.equal(scene.citations.length,2);assert.equal(scene.decision,'pending');assert.equal(p.audit.at(-1).event,'sentence.evidence_attached');
+ assert.deepEqual(scene.independentGroups,['org-a','org-b']);assert.equal(scene.citations.length,2);assert.equal(scene.decision,'pending');assert.equal(p.audit.length,0);
 });
 test('source exclusion invalidates only dependent sentences',()=>{
  const a=normalizeScene(raw,candidates,1),b={...normalizeScene(raw,candidates,2),citations:[{...candidates[0],sourceId:'S2',quote:text}],decision:'accepted'};

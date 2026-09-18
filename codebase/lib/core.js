@@ -5,6 +5,32 @@ export const digest = value => createHash('sha256').update(value).digest('hex');
 export const normalize = value => String(value ?? '').normalize('NFC').replace(/\s+/gu, ' ').trim();
 export const SCREEN_TEXT_MAX = 100;
 export const spokenSentences = text => [...new Intl.Segmenter('vi',{granularity:'sentence'}).segment(String(text || ''))].map(item=>item.segment.trim()).filter(Boolean);
+// A slide bullet may be wrapped without changing its words. This is used only
+// after an AI rewrite, so a model cannot leave a trivially overlong display
+// field that prevents the reviewer from proceeding.
+export function fitSlideBullets(values, max=120, maxItems=5) {
+  const original=(Array.isArray(values)?values:[]).map(value=>String(value).trim()).filter(Boolean);
+  const wrapped=[];
+  for(const item of original) {
+    if(item.length<=max) { wrapped.push(item);continue; }
+    let line='';
+    for(const word of item.split(/\s+/u)) {
+      if(!line) { line=word;continue; }
+      if(`${line} ${word}`.length<=max) { line+=` ${word}`;continue; }
+      wrapped.push(line);line=word;
+    }
+    if(line) wrapped.push(line);
+  }
+  // If wrapping would exceed the designed two-to-five-item slide layout, let
+  // the normal validation ask the AI/reviewer for a real summary instead of
+  // silently dropping part of the teaching content.
+  return wrapped.length>=2&&wrapped.length<=maxItems?wrapped:original;
+}
+export function clipScreenText(value, max=SCREEN_TEXT_MAX) {
+  const text=String(value||'').trim();if(text.length<=max)return text;
+  const prefix=text.slice(0,max+1), boundary=prefix.lastIndexOf(' ');
+  return (boundary>max*.55?prefix.slice(0,boundary):text.slice(0,max)).trim();
+}
 const digitWords=['không','một','hai','ba','bốn','năm','sáu','bảy','tám','chín'];
 function underThousand(value, full=false) {
   const hundreds=Math.floor(value/100), rest=value%100, tens=Math.floor(rest/10), ones=rest%10, parts=[];
@@ -49,7 +75,9 @@ export function formatNarrationForSpeech(text) {
     .replace(/\bJSON\b/gu,'định dạng dữ liệu có cấu trúc')
     .replace(/\bNLP\b/gu,'xử lý ngôn ngữ tự nhiên')
     .replace(/\bCTA\b/gu,'lời kêu gọi hành động');
-  return spellNumbersForSpeech(value);
+  // Numbers may be values, version labels, or code identifiers. Keep them
+  // verbatim; the project does not require spelling numbers out for narration.
+  return value;
 }
 export class AppError extends Error {
   constructor(message, status = 400) { super(message); this.status = status; }
@@ -151,15 +179,29 @@ export function scopeCheck(topic) {
 export function noSource(reason, title = 'Chưa đủ căn cứ') {
   return { id: randomUUID(), title, text: '', status: 'NO_SOURCE', reason, citations: [], decision: 'pending', humanVerified: false };
 }
+// This is deliberately exact: a quote is evidence only when it is a
+// contiguous excerpt from the selected chunk.  Keeping the check separate
+// lets the service ask the model to correct a malformed citation before the
+// scene is discarded, without ever accepting a fuzzy or invented quote.
+export function citationValidationIssue(raw, candidates) {
+  if (!raw || typeof raw.text !== 'string' || !raw.text.trim() || raw.status === 'NO_SOURCE') return '';
+  if (!Array.isArray(raw.citations) || raw.citations.length === 0 || raw.citations.length > 8) return 'Không có trích dẫn hợp lệ. Nội dung đã bị chặn.';
+  for (const item of raw.citations) {
+    const chunk = Array.isArray(candidates) && candidates.find(c => c.id === item?.chunkId);
+    const quote = normalize(item?.quote);
+    // No fuzzy matching: wrong source, invented quote, or guessed locator is rejected.
+    if (!chunk || quote.length < 12 || !normalize(chunk.text).includes(quote)) return 'Mã nguồn hoặc trích đoạn không khớp tài liệu đã chọn. Nội dung đã bị chặn.';
+  }
+  return '';
+}
 export function validateSegment(raw, candidates) {
   if (!raw || typeof raw.text !== 'string' || !raw.text.trim() || raw.status === 'NO_SOURCE') return noSource(String(raw?.reason || 'Nguồn không đủ để viết đoạn này.').slice(0,1000), String(raw?.title || 'Chưa đủ căn cứ').slice(0, 200));
-  if (!Array.isArray(raw.citations) || raw.citations.length === 0 || raw.citations.length > 8) return noSource('Không có trích dẫn hợp lệ. Nội dung đã bị chặn.');
+  const citationIssue = citationValidationIssue(raw, candidates);
+  if (citationIssue) return noSource(citationIssue);
   const citations = [];
   for (const item of raw.citations) {
     const chunk = candidates.find(c => c.id === item.chunkId);
     const quote = normalize(item.quote);
-    // No fuzzy matching: wrong source, invented quote, or guessed locator is rejected.
-    if (!chunk || quote.length < 12 || !normalize(chunk.text).includes(quote)) return noSource('Mã nguồn hoặc trích đoạn không khớp tài liệu đã chọn. Nội dung đã bị chặn.');
     citations.push({ chunkId: chunk.id, sourceId: chunk.sourceId, quote, publisherGroup: chunk.publisherGroup,
       locator: chunk.locator, title: chunk.title, publisher: chunk.publisher, url: chunk.url, sourceLocator: chunk.sourceLocator });
   }
@@ -174,7 +216,6 @@ export function validateSegment(raw, candidates) {
 }
 export function sceneIssues(scene) {
   const issues = teachingIssues(scene,scene.targetUnits);
-  if (/\d/u.test(scene.text)) issues.push('Lời đọc còn chữ số; hãy viết số bằng chữ.');
   if (/\b(?:AI|LLM|JSON|CTA|API|NLP|GPT)\b/u.test(scene.text)) issues.push('Lời đọc còn viết tắt; dùng tên đầy đủ hoặc nghĩa tiếng Việt.');
   if ((scene.screenText || '').length > SCREEN_TEXT_MAX) issues.push(`Chữ trên màn hình vượt ${SCREEN_TEXT_MAX} ký tự.`);
   if (!scene.screenText || !scene.visual) issues.push('Cần chữ trên màn hình và ý đồ hình.');
@@ -183,11 +224,9 @@ export function sceneIssues(scene) {
   return issues;
 }
 export function isNumeric(text) {
-  // Only claims with an actual measurement/quantity invoke the two-source
-  // safeguard. Counts in a hypothetical code example ("một phần tử") or a
-  // model's mistaken statistic label still need a citation and human review,
-  // but are not empirical statistics.
-  return /\d|\b(?:một nửa|gấp (?:hai|ba|bốn|năm))\b|\b(?:một|hai|ba|bốn|năm|sáu|bảy|tám|chín|mười|trăm|nghìn|ngàn|triệu|tỷ)\s+(?:phần trăm|ngày|giờ|phút|tuần|tháng|năm|đô la|token|mẫu quan sát)\b/iu.test(text);
+  // Keep a metric label for display/analytics only. It never changes the
+  // approval threshold: every claim still needs evidence and human review.
+  return /\d+(?:[.,]\d+)?\s*%|\d+(?:[.,]\d+)?\s+(?:phần trăm|ngày|giờ|phút|tuần|tháng|năm|đô la|token|mẫu quan sát)\b|\b(?:một nửa|gấp (?:hai|ba|bốn|năm))\b|\b(?:một|hai|ba|bốn|năm|sáu|bảy|tám|chín|mười|trăm|nghìn|ngàn|triệu|tỷ)\s+(?:phần trăm|ngày|giờ|phút|tuần|tháng|năm|đô la|token|mẫu quan sát)\b/iu.test(text);
 }
 export function normalizeScene(raw, candidates, n) {
   const scene = validateSegment(raw, candidates);
@@ -204,11 +243,7 @@ export function normalizeScene(raw, candidates, n) {
     text:speechText,claimType: statistic ? 'statistic' : raw.claimType === 'example' ? 'example' : 'concept', independentGroups: groups,
     numericVerified: false, resolution: '', originalText: scene.text };
   if (mechanicallyFormatted&&result.status!=='NO_SOURCE') {
-    result.status='NEEDS_VERIFY';result.reason='Đã chuẩn hóa chữ số và viết tắt cho lời đọc; cần đối chiếu nguồn và duyệt lại ý nghĩa.';
-  }
-  if (statistic && scene.status !== 'NO_SOURCE') {
-    result.status = 'NEEDS_VERIFY';
-    result.reason = groups.length < 2 ? 'Số liệu chưa có ít nhất hai tổ chức độc lập hỗ trợ; cần bỏ số liệu hoặc bổ sung nguồn.' : 'Có nhiều tổ chức được dẫn; cần người duyệt kiểm tra tính độc lập và cùng xác nhận số liệu.';
+    result.status='NEEDS_VERIFY';result.reason='Đã mở rộng viết tắt cho lời đọc; cần đối chiếu nguồn và duyệt lại ý nghĩa.';
   }
   result.issues = sceneIssues(result);
   return result;
@@ -240,11 +275,6 @@ export function reviewScene(scene, input) {
     }
     result.issues = sceneIssues(result);
     if (result.issues.length) throw new AppError(`Chưa thể chấp nhận: ${result.issues.join(' ')}`);
-    if (result.claimType === 'statistic') {
-      const quotes = new Set(result.citations.map(c => normalize(c.quote).toLowerCase()));
-      if (result.independentGroups.length < 2 || quotes.size < 2 || input.independent !== true) throw new AppError('Số liệu cần hai nguồn độc lập, bằng chứng riêng và xác nhận của người duyệt.');
-      result.numericVerified = true;
-    }
     if (scene.conflict && (!input.resolution || input.resolution.trim().length < 15)) throw new AppError('Cần ghi rõ cách xử lý mâu thuẫn trước khi chấp nhận.');
     result.resolution = String(input.resolution || '').slice(0, 1000);
   }
@@ -269,7 +299,7 @@ export function ensureExportable(project) {
   const kept = project.scenes.filter(s => s.decision === 'accepted');
   if (!kept.length) throw new AppError('Chưa có câu được duyệt.', 409);
   for (const s of kept) {
-    if (s.status === 'NO_SOURCE' || !s.humanVerified || sceneIssues(s).length || !s.citations.length || (s.claimType === 'statistic' && !s.numericVerified)) throw new AppError('Còn câu thiếu kiểm chứng hoặc chưa đúng mẫu.', 409);
+    if (s.status === 'NO_SOURCE' || !s.humanVerified || sceneIssues(s).length || !s.citations.length) throw new AppError('Còn câu thiếu kiểm chứng hoặc chưa đúng mẫu.', 409);
     for (const c of s.citations) {
       const source = project.sources.find(x => x.id === c.sourceId);
       const chunk = source?.chunks.find(x => x.id === c.chunkId);

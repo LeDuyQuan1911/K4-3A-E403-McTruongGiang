@@ -9,6 +9,10 @@ test('source decisions preserve the reviewed source position in the client rende
   assert.match(app,/data-action="recheck-source"/);
   assert.match(app,/data-action="approve-all-sources"/);
   assert.match(app,/data-action="approve-all-scenes"/);
+  assert.match(app,/data-action="ai-rewrite-scene"/);
+  assert.match(app,/LỊCH SỬ BẢN XUẤT/);
+  assert.match(app,/entry\.event==='export\.created'/);
+  assert.doesNotMatch(app,/JSON\.stringify\(Object\.fromEntries\(Object\.entries\(a\)/);
   assert.doesNotMatch(app,/\$\('#recent'\)/);
 });
 test('HTTP workflow enforces CSRF, disallows secrets/static traversal, persists and exports',async()=>{
@@ -30,6 +34,8 @@ test('HTTP workflow enforces CSRF, disallows secrets/static traversal, persists 
   assert.ok(r.data.scenes.every(s=>s.decision==='accepted'));
   assert.equal((await post(`${prefix}/teacher`,{reviewer:'TEST-GV',confirmed:true})).status,200);
   const exported=await post(`${prefix}/export`,{});assert.equal(exported.status,200);assert.equal(exported.data.script.schema,'hackathon-kich-ban/1');
+  assert.deepEqual(exported.data.audit,[{at:exported.data.audit[0].at,event:'export.created',version:1,reviewer:'TEST-GV',approvedAt:exported.data.audit[0].approvedAt,scenes:5}]);
+  const repeated=await post(`${prefix}/export`,{});assert.equal(repeated.status,200);assert.equal(repeated.data.audit.length,1);
   assert.equal((await fetch(`${base}/api/bootstrap`,{headers:{Origin:'https://evil.test'}})).status,403);
   assert.equal((await post(`${prefix}/delete`,{confirmed:true})).status,200);assert.equal(store.projects.length,0);
  } finally { await new Promise(r=>server.close(r)); }

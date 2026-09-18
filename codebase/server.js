@@ -54,11 +54,21 @@ export async function createServer(options = {}) {
       if (action === 'repair') return send(await studio.repair(p));
       if (action === 'format') return send(await studio.formatNarration(p));
       if (action === 'scenes' && parts.length === 5 && parts[4] === 'approve-all') return send(await studio.approveAllScenes(p,input));
+      if (action === 'scenes' && parts.length === 6 && parts[5] === 'ai-rewrite') return send(await studio.rewriteScene(p,parts[4]));
       if (action === 'scenes' && parts.length === 5) return send(await studio.review(p,parts[4],input));
       if (action === 'scenes' && parts.length === 6 && parts[5] === 'evidence') return send(await studio.attachEvidence(p,parts[4],input));
       if (action === 'teacher') return send(await studio.approveTeacher(p,input));
       if (action === 'hard-cases') return send(await studio.hardCases(p));
-      if (action === 'export') { const data = buildExports(p);studio.audit(p,'export.created');await store.save();return send(data); }
+      if (action === 'export') {
+        // Validate the final approval before recording a delivery.  The first
+        // call is intentionally only a guard; the second serializes the new
+        // export record into audit-log.json as part of the same bundle.
+        buildExports(p);
+        studio.audit(p,'export.created',{reviewer:p.teacherApproval.reviewer,approvedAt:p.teacherApproval.at,
+          scenes:p.scenes.filter(scene=>scene.decision==='accepted').length});
+        const data = buildExports(p);
+        await store.save();return send(data);
+      }
       if (action === 'delete') {
         if (input.confirmed !== true) throw new AppError('Cần xác nhận xóa dữ liệu dự án.');
         store.projects = store.projects.filter(x=>x.id !== p.id);await store.save();return send({deleted:true});

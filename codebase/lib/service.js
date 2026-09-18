@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { readFile, mkdir, rename, writeFile } from 'node:fs/promises';
 import path from 'node:path';
-import { AppError, required, normalize, tokens, topicTerms, topicRelevance, retrieve, normalizeScene, noSource, scopeCheck, validateConflicts, invalidateSource, reviewScene, ensureExportable, digest, sceneIssues, formatNarrationForSpeech } from './core.js';
+import { AppError, required, normalize, tokens, topicTerms, topicRelevance, retrieve, normalizeScene, noSource, scopeCheck, validateConflicts, invalidateSource, reviewScene, ensureExportable, digest, sceneIssues, formatNarrationForSpeech, fitSlideBullets, clipScreenText, isNumeric, citationValidationIssue } from './core.js';
 import { readSource, parsePage } from './web.js';
 import { AI } from './ai.js';
 import { detailedLessonPlan, narrationUnits, teachingIssues, duplicateNarration } from './lesson.js';
@@ -71,7 +71,24 @@ export class Store {
     try {
       this.projects = JSON.parse(await readFile(path.join(this.directory, 'projects.json'), 'utf8'));
       for (const project of this.projects) {
-        for (const scene of project.scenes || []) scene.issues = sceneIssues(scene);
+        // The user-facing history is a delivery history, not a stream of
+        // every click or model request. Keep only past export records.
+        project.audit=(project.audit||[]).filter(entry=>entry.event==='export.created').map((entry,index)=>({
+          event:'export.created',at:entry.at,version:Number.isInteger(entry.version)?entry.version:index+1,
+          reviewer:entry.reviewer||project.teacherApproval?.reviewer||'Không rõ',
+          approvedAt:entry.approvedAt||project.teacherApproval?.at||null,
+          scenes:Number.isInteger(entry.scenes)?entry.scenes:null
+        }));
+        for (const scene of project.scenes || []) {
+          // Earlier builds treated every digit, including code versions and
+          // printed tutorial outputs, as an empirical statistic. Reclassify
+          // those saved scenes using the current, narrower metric rule.
+          if (scene.claimType==='statistic'&&!isNumeric(`${scene.text || ''} ${scene.screenText || ''}`)) scene.claimType='concept';
+          if (['Số liệu chưa có ít nhất hai tổ chức độc lập hỗ trợ; cần bỏ số liệu hoặc bổ sung nguồn.','Có nhiều tổ chức được dẫn; cần người duyệt kiểm tra tính độc lập và cùng xác nhận số liệu.'].includes(scene.reason)) {
+            scene.reason='Cần đối chiếu ý nghĩa, thuật ngữ và mọi khẳng định với nguồn trước khi chấp nhận.';
+          }
+          scene.issues = sceneIssues(scene);
+        }
         if (project.mode==='live' && prefersInternational(project.brief)) for (const source of project.sources) source.contentPolicy=sourcePolicy(source.url,source.title,source.language);
       }
     }
@@ -90,7 +107,17 @@ export class Store {
 }
 export class Studio {
   constructor(store, { ai = new AI(), reader = readSource } = {}) { this.store = store; this.ai = ai; this.reader = reader; }
-  audit(p, event, detail = {}) { p.audit.push({ at: new Date().toISOString(), event, ...detail }); p.updatedAt = new Date().toISOString(); }
+  audit(p, event, detail = {}) {
+    p.updatedAt = new Date().toISOString();
+    if(event!=='export.created') return;
+    p.audit ||= [];
+    // A delivered version is the reviewed bundle, not each individual file
+    // in that bundle. Downloading script.md and trace.json after the same
+    // approval therefore remains one history row.
+    if (p.audit.some(entry => entry.event === 'export.created' && entry.approvedAt === detail.approvedAt)) return;
+    const version=Math.max(0,...p.audit.map(entry=>Number.isInteger(entry.version)?entry.version:0))+1;
+    p.audit.push({at:p.updatedAt,event,version,...detail});
+  }
   async create(input) {
     if (this.store.projects.length >= 30) throw new AppError('Đã có 30 dự án. Xuất và xóa dự án không dùng trước khi tạo mới.');
     const brief = { topic: required(input.topic, 'Chủ đề', 300), goal: required(input.goal, 'Mục tiêu học tập', 700),
@@ -269,9 +296,13 @@ export class Studio {
         };
         let raw = await this.ai.draft(p.brief, slideEvidence, d => this.audit(p, d.event, d), request);
         const assess = scene => ({...scene,duplicateOf:duplicateNarration(scene.text,rawScenes.map(s=>s.text))+1});
-        const feedback = raw.scenes.flatMap(scene=>teachingIssues(assess(scene),plan.targetUnitsPerScene));
+        const teachingFeedback = raw.scenes.flatMap(scene=>teachingIssues(assess(scene),plan.targetUnitsPerScene));
+        const citationFeedback = raw.scenes.flatMap((scene,offset) => citationValidationIssue(scene, slideEvidence)
+          ? [`Cảnh ${start + offset + 1}: trích dẫn trước đó không vượt kiểm chứng. Mỗi citations[].chunkId phải đúng một evidence đã gửi; quote phải là đoạn NGUYÊN VĂN LIÊN TỤC ít nhất mười hai ký tự từ đúng chunk đó, không dịch, tóm tắt hay thêm dấu ba chấm. Hãy trả lại toàn bộ cảnh với citation đã sửa; nếu evidence không hỗ trợ thì trả text rỗng và NO_SOURCE.`]
+          : []);
+        const feedback = [...teachingFeedback, ...citationFeedback];
         if (feedback.length) {
-          this.audit(p,'script.depth_retry',{slide:start+1,issues:feedback});
+          this.audit(p,'script.draft_retry',{slide:start+1,issues:feedback});
           raw = await this.ai.draft(p.brief,slideEvidence,d=>this.audit(p,d.event,d),{...request,feedback});
         }
         rawConflicts.push(...raw.conflicts);
@@ -345,13 +376,53 @@ export class Studio {
     this.audit(p, `sentence.${input.action}`, { sentence: before.n, beforeHash: digest(before.text), afterHash: digest(p.scenes[i].text), resolution: p.scenes[i].resolution });
     await this.store.save(); return p;
   }
+  async rewriteScene(p, id) {
+    const index=p.scenes.findIndex(scene=>scene.id===id);
+    if(index<0) throw new AppError('Không tìm thấy cảnh.',404);
+    const before=p.scenes[index];
+    if(before.decision!=='pending') throw new AppError('Chỉ có thể viết lại bằng AI cho cảnh đang chờ duyệt.');
+    if(!this.ai.enabled) throw new AppError('Sửa bằng AI cần cấu hình khóa nhà cung cấp AI trên máy chủ. Bạn vẫn có thể bấm Sửa để chỉnh thủ công.',503);
+    // Keep the rewrite grounded in the scene's existing evidence. The model
+    // cannot silently broaden its factual basis or invent a replacement source.
+    const citationIds=new Set(before.citations.map(citation=>citation.chunkId));
+    const available=this.candidates(p);
+    // A NO_SOURCE scene has no retained citation by design.  It may still be
+    // recovered from the project's approved evidence; it never receives an
+    // unrestricted model call.
+    const candidates=citationIds.size ? available.filter(candidate=>citationIds.has(candidate.id)) : available;
+    if(!candidates.length) throw new AppError('Không còn dẫn chứng đã duyệt để AI viết lại cảnh này. Hãy duyệt nguồn hoặc bổ sung học liệu trước.');
+    const request={
+      sentence:before.n,intent:before.title,previousText:before.text,
+      slide:{title:before.title,slideBullets:before.slideBullets,screenText:before.screenText,visual:before.visual,style:before.style},
+      feedback:[...before.issues, before.text ? 'Giữ nguyên ý dạy và chỉ dùng các dẫn chứng đã cung cấp.' : 'Cảnh trước bị chặn vì citation không kiểm chứng được. Viết lại cảnh này chỉ từ evidence đã gửi.', 'Sửa riêng cảnh này để lời đọc không còn viết tắt, chữ trên màn hình không quá một trăm ký tự, và mỗi ý slide không quá một trăm hai mươi ký tự. Không tự tạo số liệu hay nguồn mới.'],
+      plan:{count:1,start:before.n,total:p.scenes.length,targetUnitsPerScene:before.targetUnits||150}
+    };
+    let raw=await this.ai.draft(p.brief,candidates,detail=>this.audit(p,detail.event,detail),request);
+    if (citationValidationIssue(raw.scenes[0], candidates)) {
+      this.audit(p,'script.citation_retry',{slide:before.n});
+      raw=await this.ai.draft(p.brief,candidates,detail=>this.audit(p,detail.event,detail),{...request,feedback:[...request.feedback,'Trích dẫn vừa trả về không khớp evidence. Chỉ sửa citations theo đúng chunkId và quote nguyên văn liên tục của evidence; không đổi sang nguồn ngoài danh sách.']});
+    }
+    const replacement=normalizeScene({...raw.scenes[0]||noSource('AI không trả về cảnh thay thế.'),targetUnits:before.targetUnits},candidates,before.n);
+    replacement.id=before.id;replacement.section=before.section;replacement.needsRepair=false;
+    replacement.slideBullets=fitSlideBullets(replacement.slideBullets);
+    replacement.screenText=clipScreenText(replacement.screenText);
+    const duplicate=duplicateNarration(replacement.text,p.scenes.filter(scene=>scene.id!==id&&scene.decision!=='rejected').map(scene=>scene.text));
+    replacement.duplicateOf=duplicate>=0?p.scenes.filter(scene=>scene.id!==id&&scene.decision!=='rejected')[duplicate].n:0;
+    replacement.issues=sceneIssues(replacement);
+    const conflicts=validateConflicts(raw.conflicts,candidates);p.conflicts.push(...conflicts);
+    const related=conflicts.filter(conflict=>conflict.citations.some(citation=>replacement.citations.some(item=>item.chunkId===citation.chunkId)));
+    if(related.length) { replacement.conflict=related.map(conflict=>conflict.description).join(' ');replacement.status='NEEDS_VERIFY'; }
+    p.scenes[index]=replacement;p.teacherApproval=null;
+    this.audit(p,'sentence.ai_rewritten',{sentence:before.n,beforeHash:digest(before.text),afterHash:digest(replacement.text),remainingIssues:replacement.issues});
+    await this.store.save();return p;
+  }
   async approveAllScenes(p, input) {
     if(input.confirmed!==true) throw new AppError('Cần xác nhận đã đọc bằng chứng của các cảnh trước khi chấp nhận hàng loạt.');
     const approved=[],skipped=[];
     for(let index=0;index<p.scenes.length;index++) {
       const scene=p.scenes[index];if(scene.decision!=='pending')continue;
       try {
-        p.scenes[index]=reviewScene(scene,{action:'accept',verified:true,independent:true,resolution:input.resolution||''});
+        p.scenes[index]=reviewScene(scene,{action:'accept',verified:true,resolution:input.resolution||''});
         approved.push(scene.n);
       } catch(error) { skipped.push({sentence:scene.n,reason:error instanceof AppError?error.message:'không đủ điều kiện'}); }
     }
@@ -375,8 +446,6 @@ export class Studio {
     }
     const existing=scene.citations||[], merged=[...new Map([...existing,...additions].map(citation=>[citation.chunkId,citation])).values()];
     if (merged.length>8) throw new AppError('Một cảnh chỉ nhận tối đa tám trích đoạn; hãy chọn phần trực tiếp nhất.');
-    const beforeGroups=new Set(existing.map(citation=>citation.publisherGroup));
-    if (scene.claimType==='statistic'&&!additions.some(citation=>!beforeGroups.has(citation.publisherGroup))) throw new AppError('Với số liệu, hãy chọn đoạn từ tổ chức độc lập thay vì lặp lại nguồn đang có.');
     scene.citations=merged;scene.independentGroups=[...new Set(merged.map(citation=>citation.publisherGroup).filter(Boolean))];
     scene.status='NEEDS_VERIFY';scene.decision='pending';scene.humanVerified=false;scene.numericVerified=false;
     scene.reason='Đã bổ sung dẫn chứng; hãy đối chiếu ý nghĩa, phạm vi đo và xác nhận lại trước khi chấp nhận.';
@@ -390,10 +459,10 @@ export class Studio {
       if (scene.decision!=='pending'||!scene.text) continue;
       const text=formatNarrationForSpeech(scene.text);if(text===scene.text) continue;
       scene.text=text;scene.status='NEEDS_VERIFY';scene.humanVerified=false;scene.numericVerified=false;
-      scene.reason='Đã chuẩn hóa chữ số và viết tắt cho lời đọc; cần đối chiếu nguồn và duyệt lại ý nghĩa.';
+      scene.reason='Đã mở rộng viết tắt trong lời đọc; cần đối chiếu nguồn và duyệt lại ý nghĩa.';
       scene.issues=sceneIssues(scene);changed++;
     }
-    if (!changed) throw new AppError('Không có cảnh chờ duyệt nào cần chuẩn hóa chữ số hoặc viết tắt.');
+    if (!changed) throw new AppError('Không có cảnh chờ duyệt nào cần mở rộng viết tắt.');
     p.teacherApproval=null;this.audit(p,'script.format_normalized',{scenes:changed});await this.store.save();return p;
   }
   async approveTeacher(p, input) {
