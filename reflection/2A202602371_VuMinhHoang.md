@@ -45,9 +45,8 @@ Tôi dùng AI để nháp câu hỏi phỏng vấn, đề xuất nhiệm vụ us
 
 ## 4. Một bài học thực tế rút ra từ chính các trường hợp thất bại của nhóm
 
-### 🔴 Prototype chạy được chưa chứng minh người dùng hiểu và tin flow
+### 🔴 Feedback ở bản cũ không tự động chứng minh trải nghiệm bản hiện tại
 
-- **Sự cố/giới hạn:** Hiện khung validation đã có nhưng log feedback từ ít nhất hai người ngoài nhóm vẫn chưa hoàn chỉnh. Vì vậy, nhóm không có cơ sở để nói người dùng chấp nhận bản nháp hoặc hiểu ngay bước duyệt nguồn.
+- **Sự cố/giới hạn:** Nhóm có log feedback ẩn danh của prototype trước, nhưng chưa chạy lại đầy đủ cùng các task đó trên phiên bản hiện tại. Vì vậy, nhóm không có cơ sở để nói người dùng chấp nhận bản nháp hiện tại hoặc hiểu ngay bước duyệt nguồn.
 - **Phân tích:** Với ScriptForge, người dùng phải nhìn thấy lý do của `NEEDS_VERIFY`/`NO_SOURCE` và biết vì sao chưa thể xuất kịch bản. Nếu họ bỏ qua bước duyệt nguồn hoặc không hiểu citation, cơ chế an toàn trong code sẽ không tự tạo ra trải nghiệm tốt.
-- **Bài học rút ra:** Tôi học được rằng validation không phải một mục để điền cho đủ bonus. Nó là cách kiểm tra giả định UX quan trọng nhất: người dùng có hiểu giới hạn của AI và còn kiểm soát được quyết định hay không. Trước khi kết luận về user acceptance, tôi cần hoàn thành tối thiểu hai phiên thử, ghi trung thực cả phản hồi tiêu cực và cập nhật changelog từ kết quả đó.
-
+- **Bài học rút ra:** Tôi học được rằng validation không phải một mục để điền cho đủ bonus. Nó là cách kiểm tra giả định UX quan trọng nhất: người dùng có hiểu giới hạn của AI và còn kiểm soát được quyết định hay không. Trước khi kết luận về user acceptance của bản hiện tại, tôi cần chạy lại tối thiểu hai phiên thử, ghi trung thực cả phản hồi tiêu cực và cập nhật changelog từ kết quả đó.
