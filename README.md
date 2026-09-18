@@ -8,10 +8,10 @@
 
 | Họ và Tên | Mã Học Viên | Vai trò chính | Phần việc đảm nhiệm trong dự án |
 |---|---|---|---|
-| Lê Duy Quân |  | Nhóm trưởng | Form chương trình, prototype (RAG + UI), eval |
-| Bùi Trọng Trịnh |  | Dev | Prototype (RAG pipeline + UI), prompt engineering |
-| Nguyễn Lê Phúc Thắng |  | Dev + Evidence | Code, viết khảo sát, spec, golden set |
-| Vũ Minh Hoàng |  | Khảo sát + Validation | Khảo sát Studio team, user test, demo |
+| Lê Duy Quân | `2A202602731` | Nhóm trưởng | Form chương trình, prototype (RAG + UI), eval |
+| Bùi Trọng Trịnh | `2A202602861` | Dev | Prototype (RAG pipeline + UI), prompt engineering |
+| Nguyễn Lê Phúc Thắng | `2A202602638` | Dev + Evidence | Code, viết khảo sát, spec, golden set |
+| Vũ Minh Hoàng | `2A202602371` | Khảo sát + Validation | Khảo sát Studio team, user test, demo |
 
 ## 📁 Cấu trúc repo
 
