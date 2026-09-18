@@ -24,6 +24,7 @@ function toggleTheme() {
   applyTheme(next);
 }
 applyTheme(getTheme());
+try{if(localStorage.getItem('scriptforge.sidebar')==='collapsed'){const sb=$('.sidebar');if(sb)sb.classList.add('collapsed');}}catch{}
 async function api(path, input) {
   const response = await fetch(path, input === undefined ? {} : { method:'POST', headers:{'Content-Type':'application/json','X-CSRF-Token':state.boot.csrf}, body:JSON.stringify(input) });
   let result;try { result = await response.json(); } catch { throw new Error('Máy chủ chưa trả dữ liệu hợp lệ. Hãy kiểm tra ứng dụng đang chạy.'); }
@@ -237,11 +238,7 @@ function briefView() {
   <div class="brief-layout"><form class="card modern-box" id="brief-form">
     <div class="card-glow-bar"></div>
     <div class="card-heading">
-      <div>
-        <span class="box-tag">THIẾT KẾ ĐỀ BÀI</span>
-        <h2>Bạn muốn dạy điều gì?</h2>
-      </div>
-      <span class="section-number">01 / 04</span>
+      <h2>Bạn muốn dạy điều gì?</h2>
     </div>
     <label class="field">
       <div class="field-top">
@@ -460,11 +457,13 @@ function help() {
   <h3>Phạm vi & dữ liệu</h3><p>Viết kịch bản toàn bài theo thời lượng đã chọn, chia thành cảnh để đối chiếu từng claim. Chỉ đọc HTML công khai, tôn trọng robots.txt, không vượt paywall. Trích dẫn khớp văn bản vẫn cần người có chuyên môn kiểm tra ý nghĩa, quyền sử dụng và tính độc lập. Bộ thử minh họa dùng dữ liệu giả.</p><p>Dữ liệu lưu ở <code>codebase/data</code>; bản hiện tại chạy cục bộ, chưa có đăng nhập đa người dùng. Xóa bản lưu tại “Nhật ký hoạt động → Xóa dữ liệu dự án”.</p>`);
 }
 document.addEventListener('click',async e=>{
+  const brand=e.target.closest('.brand');if(brand&&$('.sidebar').classList.contains('collapsed')){e.preventDefault();const sb=$('.sidebar');sb.classList.remove('collapsed');try{localStorage.setItem('scriptforge.sidebar','open')}catch{}return;}
   const button=e.target.closest('[data-action]');if(!button||button.disabled)return;
   const action=button.dataset.action,id=button.dataset.id;
   if(action==='close-dialog')return $('#detail-dialog').close();
   if(action==='close-delete')return $('#delete-dialog').close();
   if(action==='toggle-theme')return toggleTheme();
+  if(action==='toggle-sidebar'){const sb=$('.sidebar');sb.classList.toggle('collapsed');try{localStorage.setItem('scriptforge.sidebar',sb.classList.contains('collapsed')?'collapsed':'open')}catch{}return;}
   if(action==='help')return help();
   if(state.busy)return;
   if(action==='new'){state.project=null;state.view='brief';state.editing=null;remember(null);render();return;}
