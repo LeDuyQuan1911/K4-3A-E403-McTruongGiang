@@ -8,11 +8,26 @@
 <aside class="sidebar">
 <a class="brand" href="/" aria-label="ScriptForge, trang chủ"><span class="brand-mark">s<span>f</span></span><span>scriptforge<span class="brand-sub">LESSON STUDIO</span></span></a>
 <button class="new-project" data-action="new"><span>＋</span> Kịch bản mới</button>
-<div class="nav-label">KHÔNG GIAN LÀM VIỆC</div><nav aria-label="Các bước làm kịch bản" id="navigation"></nav>
-<div class="sidebar-bottom"><div class="sidebar-note"><span class="mini-orbit">◎</span><p>Ý tưởng của bạn.<br><strong>Căn cứ rõ ràng.</strong></p></div><button class="help-button" data-action="help">ⓘ <span>Kết nối & hướng dẫn</span> ↗</button><div class="sidebar-footer"><span class="avatar">SF</span><span>Studio workspace<small>Track C3 · Hackathon</small></span><span class="online-dot"></span></div></div>
+<div class="sidebar-history-head">
+  <div class="nav-label">KỊCH BẢN ĐÃ TẠO</div>
+  <span class="history-count" id="history-count">0</span>
+</div>
+<div class="project-history-list" id="project-history" aria-label="Danh sách kịch bản đã tạo"></div>
+<div class="sidebar-bottom">
+  <button class="help-button" data-action="help">ⓘ <span>Kết nối & hướng dẫn</span> ↗</button>
+  <div class="sidebar-footer"><span class="avatar">SF</span><span>Studio workspace<small>Track C3 · Hackathon</small></span><span class="online-dot"></span></div>
+</div>
 </aside>
-<div class="main-shell"><header class="topbar"><div><span class="breadcrumb">Không gian làm việc</span><span class="crumb-divider">/</span><span id="breadcrumb-current">Kịch bản mới</span></div><div class="topbar-right"><span id="connection" class="connection">Đang kết nối…</span><span class="small-avatar">S</span></div></header>
-<main id="workspace" tabindex="-1"><div class="initial-loading">Đang mở không gian viết…</div></main>
+<div class="main-shell">
+  <button class="theme-toggle-btn top-corner" data-action="toggle-theme" aria-label="Chế độ Sáng / Tối · Nhấn để đổi âm dương" title="Chế độ Sáng / Tối · Nhấn để đổi âm dương">
+    <svg viewBox="-50 -50 100 100" width="24" height="24" class="yinyang-icon" aria-hidden="true">
+      <circle cx="0" cy="0" r="48" class="yy-bg" fill="#ffffff" stroke="currentColor" stroke-width="3"/>
+      <path d="M 0,-48 A 48,48 0 0 1 0,48 A 24,24 0 0 1 0,0 A 24,24 0 0 0 0,-48" class="yy-dark-half" fill="currentColor"/>
+      <circle cx="0" cy="-24" r="7.5" class="yy-dot-dark" fill="currentColor"/>
+      <circle cx="0" cy="24" r="7.5" class="yy-dot-light" fill="#ffffff"/>
+    </svg>
+  </button>
+  <main id="workspace" tabindex="-1"><div class="initial-loading">Đang mở không gian viết…</div></main>
 <footer class="workspace-footer"><span>SCRIPTFORGE / RESEARCH TO SCRIPT</span><span>Nguồn trước. Kịch bản sau.</span></footer></div>
 <div id="notice" role="status" aria-live="polite" hidden></div>
 <dialog id="detail-dialog"><div class="dialog-top"><span id="dialog-title"></span><button data-action="close-dialog" class="icon-button" aria-label="Đóng">×</button></div><div id="dialog-body"></div></dialog>

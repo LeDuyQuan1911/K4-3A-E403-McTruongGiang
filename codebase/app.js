@@ -1,10 +1,29 @@
 const $ = selector => document.querySelector(selector);
 const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const state = { boot:null, project:null, view:'brief', busy:false, editing:null, output:null, noticeTimer:null };
+const state = { boot:null, project:null, view:'brief', busy:false, editing:null, output:null, noticeTimer:null, theme:'light' };
 const labels = { brief:'Đề bài & mục tiêu', sources:'Hồ sơ nguồn', script:'Kịch bản', export:'Duyệt & xuất', audit:'Nhật ký hoạt động' };
 const statusLabels = { approved:'Đã duyệt', pending:'Chờ duyệt', rejected:'Đã loại', quarantined:'Đã cách ly', CITED:'CITED · Khớp nguyên văn', NEEDS_VERIFY:'NEEDS_VERIFY · Cần xác minh', NO_SOURCE:'NO_SOURCE · Thiếu căn cứ' };
 const day = value => value ? new Date(value).toLocaleDateString('vi-VN') : 'Chưa xác định';
 const badge = status => `<span class="badge ${esc(status.toLowerCase())}">${esc(statusLabels[status] || status)}</span>`;
+function getTheme() {
+  try { return localStorage.getItem('scriptforge.theme') || 'light'; } catch { return 'light'; }
+}
+function applyTheme(theme) {
+  state.theme = theme;
+  document.documentElement.setAttribute('data-theme', theme);
+  try { localStorage.setItem('scriptforge.theme', theme); } catch {}
+  const btn = $('.theme-toggle-btn');
+  if (btn) {
+    btn.setAttribute('data-theme-state', theme);
+    btn.setAttribute('title', theme === 'dark' ? 'Chế độ hiện tại: Tối (Âm) · Nhấn để đổi sang Sáng (Dương)' : 'Chế độ hiện tại: Sáng (Dương) · Nhấn để đổi sang Tối (Âm)');
+    btn.setAttribute('aria-label', theme === 'dark' ? 'Chế độ hiện tại: Tối (Âm) · Nhấn để đổi sang Sáng (Dương)' : 'Chế độ hiện tại: Sáng (Dương) · Nhấn để đổi sang Tối (Âm)');
+  }
+}
+function toggleTheme() {
+  const next = (state.theme || getTheme()) === 'dark' ? 'light' : 'dark';
+  applyTheme(next);
+}
+applyTheme(getTheme());
 async function api(path, input) {
   const response = await fetch(path, input === undefined ? {} : { method:'POST', headers:{'Content-Type':'application/json','X-CSRF-Token':state.boot.csrf}, body:JSON.stringify(input) });
   let result;try { result = await response.json(); } catch { throw new Error('Máy chủ chưa trả dữ liệu hợp lệ. Hãy kiểm tra ứng dụng đang chạy.'); }
@@ -18,17 +37,53 @@ function notice(message, error=false) {
 function remember(id) { try { if(id) localStorage.setItem('scriptforge.project',id);else localStorage.removeItem('scriptforge.project'); } catch {} }
 async function bootstrap() {
   state.boot = await api('/api/bootstrap');
-  $('#connection').textContent=`${state.boot.providerLabel} · ${state.boot.aiEnabled?'Đã cấu hình key':'Chưa có key'}`;
-  $('#connection').classList.toggle('connected',state.boot.aiEnabled);
+  const conn = $('#connection');
+  if (conn) {
+    conn.textContent=`${state.boot.providerLabel} · ${state.boot.aiEnabled?'Đã cấu hình key':'Chưa có key'}`;
+    conn.classList.toggle('connected',state.boot.aiEnabled);
+  }
 }
 function shell() {
-  const icons={brief:'▤',sources:'▧',script:'≡',export:'↗',audit:'◷'};
-  $('#navigation').innerHTML=Object.entries(labels).map(([key,label])=>`<button class="nav-item ${state.view===key?'active':''}" data-action="navigate" data-view="${key}" ${!state.project && key!=='brief'?'disabled':''} ${state.busy?'disabled':''}><span class="nav-icon">${icons[key]}</span>${label}${key==='sources'&&state.project?`<span class="nav-count">${state.project.sources.length}</span>`:''}</button>`).join('');
-  $('#breadcrumb-current').textContent=labels[state.view];
-  document.querySelectorAll('[data-action="new"]').forEach(b=>b.disabled=state.busy);
+  const projects = state.boot?.projects || [];
+  const countEl = $('#history-count');
+  if (countEl) countEl.textContent = `${projects.length}`;
+  
+  const histEl = $('#project-history');
+  if (histEl) {
+    if (!projects.length) {
+      histEl.innerHTML = `<div class="empty-projects-note"><span class="empty-box-icon">📁</span><p>Chưa có kịch bản nào.</p><span class="tiny">Bấm <b>＋ Kịch bản mới</b> để bắt đầu.</span></div>`;
+    } else {
+      histEl.innerHTML = projects.map(p => {
+        const isCurrent = state.project?.id === p.id;
+        return `<div class="project-card ${isCurrent ? 'active' : ''}" data-action="open" data-id="${esc(p.id)}" title="${esc(p.topic)}">
+          <div class="project-card-top">
+            <span class="project-badge ${p.mode==='demo'?'demo':'live'}">${p.mode==='demo'?'Thử nghiệm':'Chính thức'}</span>
+            <span class="project-date">${day(p.updatedAt)}</span>
+          </div>
+          <div class="project-card-title">${esc(p.topic || 'Kịch bản chưa đặt tên')}</div>
+          ${isCurrent ? '<div class="project-card-active-indicator"><span class="active-dot"></span> Đang mở</div>' : ''}
+        </div>`;
+      }).join('');
+    }
+  }
+
+  const breadcrumb = $('#breadcrumb-current');
+  if (breadcrumb) breadcrumb.textContent = labels[state.view] || '';
+  applyTheme(state.theme || getTheme());
+  document.querySelectorAll('[data-action="new"]').forEach(b => b.disabled = state.busy);
 }
 function steps(active) {
-  return `<div class="stepper" aria-label="Tiến trình">${['Đặt đề bài','Duyệt nguồn','Viết & đối chiếu','Duyệt & xuất'].map((s,i)=>`<div class="step ${i===active?'active':i<active?'done':''}"><b>${i<active?'✓':i+1}</b>${s}</div>`).join('')}</div>`;
+  const views = ['brief', 'sources', 'script', 'export'];
+  const stepLabels = ['Đặt đề bài', 'Duyệt nguồn', 'Viết & đối chiếu', 'Duyệt & xuất'];
+  return `<div class="stepper" aria-label="Tiến trình">${stepLabels.map((s,i)=>{
+    const isCurrent = i === active;
+    const isDone = i < active;
+    const canNav = Boolean(state.project || i === 0);
+    return `<button type="button" class="step ${isCurrent?'active':isDone?'done':''} ${canNav?'clickable':''}" ${canNav?`data-action="navigate" data-view="${views[i]}"`:'disabled'}>
+      <b>${isDone?'✓':i+1}</b>
+      <span>${s}</span>
+    </button>`;
+  }).join('')}</div>`;
 }
 function demoBanner() { return state.project?.mode==='demo'?'<div class="banner demo">◇ Bộ thử minh họa · Dữ liệu do nhóm tự tạo. Không tìm web, không gọi AI, không dùng làm tài liệu giảng dạy.</div>':''; }
 function header(eyebrow,title,subtitle,extra='') { return `<div class="heading-row"><div><div class="eyebrow">${eyebrow}</div><h1>${title}</h1><p class="subtitle">${subtitle}</p></div>${extra}</div>`; }
@@ -37,19 +92,207 @@ function render() {
   const views={brief:briefView,sources:sourcesView,script:scriptView,export:exportView,audit:auditView};
   $('#workspace').innerHTML=(state.project?`<nav class="mobile-nav" aria-label="Chuyển bước">${Object.entries(labels).map(([key,label])=>`<button class="text-button" data-action="navigate" data-view="${key}">${label}</button>`).join('')}</nav>`:'')+views[state.view]();
 }
+function getBlueprintData(b) {
+  const duration = Number(b?.duration) || 10;
+  const topic = (b?.topic || '').trim() || 'Chủ đề bài giảng của bạn';
+  const audience = (b?.audience || '').trim() || 'Người mới tìm hiểu';
+  const goal = (b?.goal || '').trim();
+  const words = duration * 140;
+  const sources = Math.max(2, Math.round(duration * 0.8));
+
+  let scenes = [];
+  if (duration <= 1) {
+    scenes = [
+      { time: '00:00 - 00:20', tag: 'Hook', title: `Hiện tượng bất ngờ về ${topic}`, cite: '1 nguồn' },
+      { time: '00:20 - 01:00', tag: 'Cốt lõi', title: `Bản chất vấn đề & Bài học 10 giây`, cite: '1 nguồn' }
+    ];
+  } else if (duration <= 3) {
+    scenes = [
+      { time: '00:00 - 00:45', tag: 'Mở đầu', title: `Đặt câu hỏi mâu thuẫn về ${topic}`, cite: '1 nguồn' },
+      { time: '00:45 - 02:15', tag: 'Khai triển', title: `Cơ chế gốc & Bằng chứng thực nghiệm`, cite: '2 nguồn' },
+      { time: '02:15 - 03:00', tag: 'Đúc kết', title: `Bài học ứng dụng tức thì cho ${audience}`, cite: '1 nguồn' }
+    ];
+  } else if (duration <= 5) {
+    scenes = [
+      { time: '00:00 - 01:00', tag: 'Mở đầu', title: `Tình huống thực tế dẫn nhập vào ${topic}`, cite: '1 nguồn' },
+      { time: '01:00 - 02:30', tag: 'Luận điểm 1', title: `Giải thích bản chất & Lý do xảy ra`, cite: '2 nguồn' },
+      { time: '02:30 - 04:00', tag: 'Luận điểm 2', title: `Thực nghiệm đối chứng & Dữ liệu xác thực`, cite: '1 nguồn' },
+      { time: '04:00 - 05:00', tag: 'Tổng kết', title: `Quy tắc cốt lõi dành cho ${audience}`, cite: '1 nguồn' }
+    ];
+  } else if (duration <= 10) {
+    scenes = [
+      { time: '00:00 - 01:30', tag: 'Cảnh 01', title: `Hiện tượng & Lý do cần hiểu sâu ${topic}`, cite: '1 nguồn' },
+      { time: '01:30 - 03:30', tag: 'Cảnh 02', title: `Cơ sở lý thuyết & Bằng chứng khoa học`, cite: '2 nguồn' },
+      { time: '03:30 - 05:30', tag: 'Cảnh 03', title: `Thực nghiệm đối chứng & Phân tích nguyên nhân`, cite: '2 nguồn' },
+      { time: '05:30 - 07:30', tag: 'Cảnh 04', title: `Những hiểu lầm phổ biến & Bằng chứng phản biện`, cite: '1 nguồn' },
+      { time: '07:30 - 09:00', tag: 'Cảnh 05', title: `Quy trình giải quyết chuẩn từng bước`, cite: '1 nguồn' },
+      { time: '09:00 - 10:00', tag: 'Cảnh 06', title: `Đúc kết toàn bài & Bài tập tư duy cho ${audience}`, cite: '1 nguồn' }
+    ];
+  } else if (duration <= 20) {
+    scenes = [
+      { time: '00:00 - 02:00', tag: 'Phần 1', title: `Mở đầu: Đặt bài toán lớn về ${topic}`, cite: '2 nguồn' },
+      { time: '02:00 - 06:00', tag: 'Phần 2', title: `Khung lý thuyết & Nền tảng học thuật`, cite: '3 nguồn' },
+      { time: '06:00 - 11:00', tag: 'Phần 3', title: `Nghiên cứu ca điển hình (Case Study) chuyên sâu`, cite: '3 nguồn' },
+      { time: '11:00 - 16:00', tag: 'Phần 4', title: `Phân tích dữ liệu đối chiếu & Thảo luận rủi ro`, cite: '2 nguồn' },
+      { time: '16:00 - 18:30', tag: 'Phần 5', title: `Giải pháp thực hành và chuyển giao kinh nghiệm`, cite: '2 nguồn' },
+      { time: '18:30 - 20:00', tag: 'Phần 6', title: `Tổng kết chuyên đề & Bài tập đánh giá cho ${audience}`, cite: '1 nguồn' }
+    ];
+  } else {
+    scenes = [
+      { time: '00:00 - 03:00', tag: 'Chương 1', title: `Tổng quan & Động lực nghiên cứu ${topic}`, cite: '3 nguồn' },
+      { time: '03:00 - 10:00', tag: 'Chương 2', title: `Hệ thống hóa kiến thức & Cơ sở dữ liệu`, cite: '4 nguồn' },
+      { time: '10:00 - 18:00', tag: 'Chương 3', title: `Thực nghiệm, kiểm chứng và đối chiếu đa nguồn`, cite: '5 nguồn' },
+      { time: '18:00 - 25:00', tag: 'Chương 4', title: `Ứng dụng thực tế & Hướng dẫn cho ${audience}`, cite: '3 nguồn' },
+      { time: '25:00 - 30:00', tag: 'Chương 5', title: `Tổng kết toàn khóa & Tài liệu mở rộng`, cite: '2 nguồn' }
+    ];
+  }
+
+  let pacing = 'Nhịp chuẩn · Cân bằng giữa giải thích & chứng minh';
+  const audLower = audience.toLowerCase();
+  if (audLower.includes('mới') || audLower.includes('cơ bản') || audLower.includes('bắt đầu')) {
+    pacing = 'Nhịp chậm · Tăng ví dụ trực quan & giải thích khái niệm';
+  } else if (audLower.includes('chuyên') || audLower.includes('kỹ sư') || audLower.includes('lập trình') || audLower.includes('nghiên cứu')) {
+    pacing = 'Nhịp nhanh · Tập trung dữ liệu gốc, công thức & luận cứ kỹ thuật';
+  } else if (audLower.includes('học sinh') || audLower.includes('sinh viên')) {
+    pacing = 'Nhịp sư phạm · Có tình huống dẫn nhập & chốt ý sau từng cảnh';
+  }
+
+  return { duration, topic, audience, goal, words, sources, scenes, pacing };
+}
+
+function blueprintView(b) {
+  const d = getBlueprintData(b);
+  const hookEnd = (d.duration * 0.15).toFixed(1).replace('.0','');
+  const coreEnd = (d.duration * 0.85).toFixed(1).replace('.0','');
+  return `<div class="blueprint-card" id="live-blueprint">
+    <div class="blueprint-top">
+      <div class="blueprint-badge"><span class="pulse-dot"></span> BẢN PHÁC THẢO THỜI GIAN THỰC</div>
+    </div>
+    <div class="blueprint-stats">
+      <div class="blueprint-stat"><span class="stat-label">Thời lượng</span><strong>${d.duration} phút</strong></div>
+      <div class="blueprint-stat"><span class="stat-label">Số cảnh</span><strong>${d.scenes.length} phân cảnh</strong></div>
+      <div class="blueprint-stat"><span class="stat-label">Dung lượng</span><strong>~${d.words.toLocaleString('vi-VN')} từ</strong></div>
+      <div class="blueprint-stat"><span class="stat-label">Nguồn dự kiến</span><strong>~${d.sources} nguồn</strong></div>
+    </div>
+    <div class="blueprint-timeline">
+      <div class="timeline-header"><span>PHÂN BỔ THỜI LƯỢNG (CHUẨN SƯ PHẠM)</span><span>TỔNG ${d.duration} PHÚT</span></div>
+      <div class="timeline-bar">
+        <div class="timeline-seg hook" style="width: 15%" title="Mở đầu / Thu hút (15%)"><span>Mở đầu (15%)</span></div>
+        <div class="timeline-seg core" style="width: 70%" title="Khai triển luận điểm & Dẫn chứng (70%)"><span>Khai triển kiến thức (70%)</span></div>
+        <div class="timeline-seg outro" style="width: 15%" title="Đúc kết & Hành động (15%)"><span>Đúc kết (15%)</span></div>
+      </div>
+      <div class="timeline-ticks"><span>00:00</span><span>~${hookEnd}m</span><span>~${coreEnd}m</span><span>${d.duration}:00</span></div>
+    </div>
+    <div class="blueprint-paper">
+      <div class="paper-header">
+        <span class="paper-tag">KỊCH BẢN DỰ KIẾN</span>
+        <span class="paper-meta" title="${esc(d.topic)}">${esc(d.topic)}</span>
+      </div>
+      <div class="blueprint-scenes">
+        ${d.scenes.map((s, idx) => `
+          <div class="blueprint-scene-row">
+            <span class="scene-idx">${String(idx + 1).padStart(2, '0')}</span>
+            <div class="scene-details">
+              <div class="scene-head-line">
+                <span class="scene-tag">${esc(s.tag)}</span>
+                <span class="scene-time">${esc(s.time)}</span>
+                <span class="scene-cite-req">${esc(s.cite)} ↗</span>
+              </div>
+              <p class="scene-title-text">${esc(s.title)}</p>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+    <div class="blueprint-footer-note">
+      <div class="blueprint-tone">
+        <span class="tone-icon">◎</span>
+        <div>
+          <strong>Phong cách: ${esc(d.audience)}</strong>
+          <p>${esc(d.pacing)}</p>
+        </div>
+      </div>
+      ${d.goal ? `
+      <div class="blueprint-goal-box">
+        <span class="goal-tag">MỤC TIÊU ĐẦU RA CAM KẾT</span>
+        <p>${esc(d.goal)}</p>
+      </div>` : ''}
+    </div>
+  </div>`;
+}
+
+function updateLiveBlueprint() {
+  const form = $('#brief-form');
+  if (!form) return;
+  const data = Object.fromEntries(new FormData(form));
+  const container = $('#blueprint-container');
+  if (container) {
+    container.innerHTML = blueprintView(data);
+  }
+}
+
 function briefView() {
   const b=state.project?.brief || {};
-  return `<div class="eyebrow">TỪ NGHIÊN CỨU ĐẾN KỊCH BẢN</div><h1>Bài giảng hay bắt đầu<br>từ <em>nguồn đáng tin.</em></h1><p class="subtitle">Biến chủ đề thành kịch bản toàn bài có căn cứ.<br>Tìm tài liệu, kiểm tra từng nguồn, rồi cùng AI viết theo thời lượng.</p>${steps(0)}
-  <div class="brief-layout"><form class="card" id="brief-form"><div class="card-heading"><h2>Bạn muốn dạy điều gì?</h2><span class="section-number">01 / 04</span></div>
-  <label class="field"><span class="field-label">Chủ đề bài giảng <span class="required">*</span></span><input name="topic" required minlength="8" maxlength="300" value="${esc(b.topic || '')}" placeholder="Ví dụ: Vì sao AI trả lời sai mà vẫn rất tự tin?"><span class="field-hint">Một chủ đề cụ thể giúp tìm đúng tài liệu.</span></label>
-  <label class="field"><span class="field-label">Mục tiêu học tập <span class="required">*</span></span><textarea name="goal" required maxlength="700" rows="3" placeholder="Sau video, người học sẽ hiểu hoặc làm được điều gì?">${esc(b.goal || '')}</textarea></label>
-  <div class="field-row"><label class="field"><span class="field-label">Người học là ai? <span class="required">*</span></span><input name="audience" required maxlength="200" value="${esc(b.audience || '')}" placeholder="Người mới tìm hiểu về AI"></label><label class="field"><span class="field-label">Thời lượng video <span class="required">*</span></span><select name="duration">${[1,3,4,5,10,15,20,30].map(n=>`<option value="${n}" ${Number(b.duration || 10)===n?'selected':''}>Khoảng ${n} phút</option>`).join('')}</select><span class="field-hint">Lời giảng được phân bổ theo thời lượng này. Bài có giải thích sâu và thực hành cần đủ thời gian; chọn một đến ba phút sẽ giới hạn phạm vi, không thể chứa toàn bộ khóa học.</span></label></div>
-  <label class="checkbox-row"><input type="checkbox" name="consent" required><span>Tôi dùng dữ liệu công khai hoặc dữ liệu giả, không nhập thông tin cá nhân. ${state.boot.searchEnabled?`Chủ đề và mục tiêu được gửi đến ${esc(state.boot.searchLabel)} để tìm nguồn.`:'Chưa bật tìm web tự động; tôi sẽ thêm URL nguồn.'} Khi viết, đề bài và bằng chứng được gửi đến ${esc(state.boot.providerLabel)}.</span></label>
-  <div class="form-bottom"><span class="tiny">Bạn sẽ duyệt các nguồn<br>trước khi AI viết kịch bản.</span><button class="button primary" type="submit">${state.project?'Tạo đề bài mới':'Bắt đầu tìm nguồn'} <span class="arrow">↗</span></button></div>
-  ${!state.boot.aiEnabled||!state.boot.searchEnabled?`<p class="field-hint">${!state.boot.aiEnabled?`Chưa có ${esc(state.boot.keyName)} để viết kịch bản. `:''}${!state.boot.searchEnabled?'Tìm web tự động chưa bật; bạn có thể lưu đề bài và thêm URL thủ công. ':''}<button type="button" class="text-button" data-action="help">Cách kết nối & đổi API</button></p>`:''}</form>
-  <aside class="brief-aside"><div class="preview-card"><div class="preview-title">MỘT KỊCH BẢN, RÕ TỪNG NGUỒN <span>↗</span></div><div class="paper-illustration" aria-label="Minh họa cấu trúc, không phải kết quả AI"><div class="paper-top">KỊCH BẢN BÀI GIẢNG · MINH HỌA BỐ CỤC</div><div class="paper-line"><span class="line-number">01</span><p>Mỗi câu chứa một ý,<br>diễn đạt bằng văn nói.</p><span class="paper-cite">nguồn ↗</span></div><div class="paper-line"><span class="line-number">02</span><p>Mỗi khẳng định đi cùng<br>bằng chứng đối chiếu.</p><span class="paper-cite">nguồn ↗</span></div><div class="proof-strip"><span>◎ Bằng chứng bên cạnh câu viết</span><span>→</span></div></div><h3>Viết sáng rõ.<br>Kiểm chứng dễ dàng.</h3><p>Bạn giữ quyền quyết định. AI nghiên cứu và đề xuất, giảng viên duyệt trước khi đưa vào video.</p><div class="promise-list"><div><span>✓</span> Nguồn gốc và ngày cập nhật rõ ràng</div><div><span>✓</span> Bấm từng câu để xem bằng chứng</div><div><span>✓</span> Bỏ nguồn, chỉ sửa câu liên quan</div></div></div>
-  <div class="demo-card"><span class="demo-icon">◈</span><div><strong>Muốn thử trước?</strong><p>Bộ dữ liệu giả, chạy ngay tại máy.</p><button class="text-button" type="button" data-action="demo">Mở bộ thử minh họa →</button></div></div></aside></div>
-  <div class="trust-footer"><span>♧</span><div>Không có căn cứ, không đưa vào bài giảng. Trích dẫn khớp văn bản vẫn cần kiểm tra ý nghĩa và ngữ cảnh.<br>Nguồn và bản nháp được lưu tại máy; chỉ phần bằng chứng cần thiết được gửi tới AI khi bạn tạo bản nháp.</div></div><div class="mobile-demo"><button class="text-button" data-action="demo">Thử bằng dữ liệu minh họa →</button></div>`;
+  return `${steps(0)}
+  <div class="brief-layout"><form class="card modern-box" id="brief-form">
+    <div class="card-glow-bar"></div>
+    <div class="card-heading">
+      <div>
+        <span class="box-tag">THIẾT KẾ ĐỀ BÀI</span>
+        <h2>Bạn muốn dạy điều gì?</h2>
+      </div>
+      <span class="section-number">01 / 04</span>
+    </div>
+    <label class="field">
+      <div class="field-top">
+        <span class="field-label">Chủ đề bài giảng <span class="required">*</span></span>
+        <div class="quick-chips">
+          <span class="chip-hint">Gợi ý:</span>
+          <button type="button" class="quick-chip" data-action="fill-topic" data-fill="Vì sao AI trả lời sai mà vẫn rất tự tin?">✦ Ảo giác AI</button>
+          <button type="button" class="quick-chip" data-action="fill-topic" data-fill="RAG là gì và giúp AI tra cứu chính xác ra sao?">✦ RAG & Bằng chứng</button>
+          <button type="button" class="quick-chip" data-action="fill-topic" data-fill="Prompt Engineering cơ bản cho người mới bắt đầu">✦ Prompt Engineering</button>
+        </div>
+      </div>
+      <div class="input-wrap">
+        <input name="topic" required minlength="8" maxlength="300" value="${esc(b.topic || '')}" placeholder="Ví dụ: Vì sao AI trả lời sai mà vẫn rất tự tin?">
+      </div>
+      <span class="field-hint">Một chủ đề cụ thể giúp tìm đúng tài liệu chuyên sâu.</span>
+    </label>
+    <label class="field">
+      <span class="field-label">Mục tiêu học tập <span class="required">*</span></span>
+      <div class="input-wrap">
+        <textarea name="goal" required maxlength="700" rows="3" placeholder="Sau video, người học sẽ hiểu hoặc làm được điều gì?">${esc(b.goal || '')}</textarea>
+      </div>
+      <span class="field-hint">Xác định kiến thức hoặc kỹ năng cụ thể sau khi xem bài giảng.</span>
+    </label>
+    <div class="field-row">
+      <label class="field">
+        <span class="field-label">Người học là ai? <span class="required">*</span></span>
+        <div class="input-wrap">
+          <input name="audience" required maxlength="200" value="${esc(b.audience || '')}" placeholder="Người mới tìm hiểu về AI">
+        </div>
+        <span class="field-hint">Điều chỉnh thuật ngữ và ví dụ cho đối tượng này.</span>
+      </label>
+      <label class="field">
+        <span class="field-label">Thời lượng video <span class="required">*</span></span>
+        <div class="input-wrap select-wrap">
+          <select name="duration">${[1,3,4,5,10,15,20,30].map(n=>`<option value="${n}" ${Number(b.duration || 10)===n?'selected':''}>Khoảng ${n} phút</option>`).join('')}</select>
+        </div>
+        <span class="field-hint">Phân bổ nhịp độ và cấu trúc theo thời lượng này.</span>
+      </label>
+    </div>
+    <div class="form-bottom">
+      <div class="form-bottom-note">
+        <span class="note-icon">✦</span>
+        <span>AI sẽ quét & đối chiếu tài liệu học thuật theo đề bài của bạn</span>
+      </div>
+      <button class="button primary action-cta" type="submit">
+        <span>${state.project?'Tạo đề bài mới':'Bắt đầu tìm nguồn'}</span>
+        <span class="arrow">↗</span>
+      </button>
+    </div>
+  </form>
+  <aside class="brief-aside"><div id="blueprint-container">${blueprintView(b)}</div></aside></div>`;
 }
 function sourceCard(s) {
   const canApprove=s.provenance.verified&&s.decision!=='quarantined'&&s.contentPolicy?.eligible!==false;
@@ -65,13 +308,56 @@ function sourceCard(s) {
 }
 function sourcesView() {
   const p=state.project, approved=p.sources.filter(s=>s.decision==='approved').length, pending=p.sources.filter(s=>s.decision==='pending').length;
-  return `${header('02 / HỒ SƠ TÀI LIỆU','Tìm được chưa đủ.<br><em>Hãy chọn nguồn đáng tin.</em>',esc(p.brief.topic))}${steps(1)}${demoBanner()}
-  ${p.mode==='live'?'<p class="field-hint">Chủ đề AI ưu tiên bản gốc tiếng Anh: tài liệu chính thức, giáo trình mở và bài nghiên cứu quốc tế. Tìm bằng Exa/Tavily theo cấu hình; không dùng trang kết quả Google Scholar hay quảng cáo Udemy làm bằng chứng. Tên miền uy tín vẫn cần kiểm tra nội dung và độ liên quan.</p>':''}
+  return `${steps(1)}${demoBanner()}
   ${p.conflicts.length?`<div class="banner">⚑ Có ${p.conflicts.length} cặp bằng chứng cần đối chiếu. <button class="text-button" data-action="conflicts">Xem khác biệt →</button></div>`:''}
-  <div class="source-layout"><section><div class="section-header"><h2>${p.sources.length} nguồn trong hồ sơ</h2><div class="button-row">${p.mode==='live'&&p.sources.length?`<button class="text-button" data-action="research" ${!state.boot.searchEnabled?'disabled':''}>↻ Tìm thêm nguồn chuyên sâu</button>`:''}<button class="text-button" data-action="criteria">Tiêu chí đánh giá ⓘ</button></div></div><div class="source-list">${p.sources.length?p.sources.map(sourceCard).join(''):`<div class="empty-state"><div class="empty-icon">⌕</div><h2>Chưa có tài liệu</h2><p>${state.boot.searchEnabled?`Tìm nguồn qua ${esc(state.boot.searchLabel)} từ chủ đề và mục tiêu của bạn.`:'Cấu hình dịch vụ tìm kiếm để tự tìm nguồn, hoặc thêm một URL HTTPS công khai ở bên dưới.'}</p><button class="button primary" data-action="research" ${!state.boot.searchEnabled&&p.mode!=='demo'?'disabled':''}>Tìm nguồn trên web ↗</button></div>`}</div>
-  ${p.failures.length?`<div class="card" style=""><h3>Nguồn không đọc được</h3>${p.failures.map(f=>`<p class="tiny">${esc(f.url)}<br>${esc(f.reason)}</p>`).join('')}</div>`:''}
-  ${p.mode==='live'?`<form id="source-form" class="source-add"><label class="field"><span class="field-label">Bổ sung nguồn của bạn</span><input name="url" type="url" required maxlength="2000" placeholder="https://…" aria-label="URL nguồn bổ sung"></label><button class="button secondary" type="submit">＋ Đọc và lập hồ sơ nguồn</button><p class="field-hint">Chỉ trang HTML công khai; không vượt đăng nhập, paywall hay robots.txt.</p></form>`:'<div class="source-add"><button class="button secondary" data-action="hard-cases">＋ Thử hai nguồn mâu thuẫn & nguồn cũ</button></div>'}
-  </section><aside class="sticky-card"><div class="eyebrow">BẠN QUYẾT ĐỊNH</div><h3>Chọn căn cứ cho bài viết</h3><div class="summary-line"><span>Đã duyệt</span><b>${approved}</b></div><div class="summary-line"><span>Chờ quyết định</span><b>${pending}</b></div><div class="summary-line"><span>Đã loại / cách ly</span><b>${p.sources.length-approved-pending}</b></div><div class="rule"></div><p>Điểm là tổng tiêu chí công khai, không phải xác suất thông tin đúng. Đọc bản gốc và kiểm tra ngữ cảnh trước khi duyệt.</p>${pending?'<button class="button secondary full-width" data-action="approve-all-sources">✓ Duyệt tất cả nguồn đủ điều kiện</button><p class="field-hint">Nguồn cách ly, thiếu điều kiện hoặc cần ghi chú sẽ không được duyệt tự động.</p>':''}<button class="button primary full-width" data-action="${p.scenes.length?'to-script':'generate'}" ${!p.scenes.length&&(pending||!approved)?'disabled':''}>${p.scenes.length?'Đến kịch bản':'Viết kịch bản toàn bài'} →</button>${pending?'<p class="field-hint">Duyệt hoặc bỏ các nguồn còn chờ để tiếp tục.</p>':''}<div class="rule"></div><button class="text-button" data-action="profile-download">↓ Tải hồ sơ nguồn hiện tại</button></aside></div>`;
+  <div class="source-layout">
+    <section class="source-main-card card">
+      <div class="card-heading">
+        <h2>${p.sources.length} nguồn trong hồ sơ</h2>
+        <div class="button-row">
+          ${p.mode==='live'&&p.sources.length?`<button class="text-button" data-action="research" ${!state.boot.searchEnabled?'disabled':''}>↻ Tìm thêm nguồn chuyên sâu</button>`:''}
+          <button class="text-button" data-action="criteria">Tiêu chí đánh giá ⓘ</button>
+        </div>
+      </div>
+      <div class="source-list-scroll">
+        ${p.sources.length?p.sources.map(sourceCard).join(''):`
+          <div class="empty-state">
+            <div class="empty-icon">⌕</div>
+            <h2>Chưa có tài liệu</h2>
+            <p>${state.boot.searchEnabled?`Tìm nguồn qua ${esc(state.boot.searchLabel)} từ chủ đề và mục tiêu của bạn.`:'Cấu hình dịch vụ tìm kiếm để tự tìm nguồn, hoặc thêm một URL HTTPS công khai ở bên dưới.'}</p>
+            <button class="button primary action-cta" data-action="research" ${!state.boot.searchEnabled&&p.mode!=='demo'?'disabled':''}>
+              <span>Tìm nguồn trên web</span>
+              <span class="arrow">↗</span>
+            </button>
+          </div>
+        `}
+        ${p.failures.length?`<div class="card error-card"><h3>Nguồn không đọc được</h3>${p.failures.map(f=>`<p class="tiny">${esc(f.url)}<br>${esc(f.reason)}</p>`).join('')}</div>`:''}
+      </div>
+      ${p.mode==='live'?`
+        <form id="source-form" class="source-add-bar">
+          <span class="add-bar-label">Bổ sung nguồn:</span>
+          <input name="url" type="url" required maxlength="2000" placeholder="https://…" aria-label="URL nguồn bổ sung">
+          <button class="button secondary" type="submit">＋ Đọc và lập hồ sơ</button>
+        </form>
+      `:'<div class="source-add-bar"><button class="button secondary" data-action="hard-cases">＋ Thử hai nguồn mâu thuẫn & nguồn cũ</button></div>'}
+    </section>
+    <aside class="sticky-card source-aside-card">
+      <div class="eyebrow">BẠN QUYẾT ĐỊNH</div>
+      <h3>Chọn căn cứ cho bài viết</h3>
+      <div class="summary-line"><span>Đã duyệt</span><b>${approved}</b></div>
+      <div class="summary-line"><span>Chờ quyết định</span><b>${pending}</b></div>
+      <div class="summary-line"><span>Đã loại / cách ly</span><b>${p.sources.length-approved-pending}</b></div>
+      <div class="rule"></div>
+      <p>Điểm là tổng tiêu chí công khai, không phải xác suất thông tin đúng. Đọc bản gốc và kiểm tra ngữ cảnh trước khi duyệt.</p>
+      ${pending?'<button class="button secondary full-width" data-action="approve-all-sources">✓ Duyệt tất cả nguồn đủ điều kiện</button><p class="field-hint">Nguồn cách ly, thiếu điều kiện hoặc cần ghi chú sẽ không được duyệt tự động.</p>':''}
+      <button class="button primary full-width" data-action="${p.scenes.length?'to-script':'generate'}" ${!p.scenes.length&&(pending||!approved)?'disabled':''}>${p.scenes.length?'Đến kịch bản':'Viết kịch bản toàn bài'} →</button>
+      ${pending?'<p class="field-hint">Duyệt hoặc bỏ các nguồn còn chờ để tiếp tục.</p>':''}
+      <div class="aside-bottom-link">
+        <div class="rule"></div>
+        <button class="text-button" data-action="profile-download">↓ Tải hồ sơ nguồn hiện tại</button>
+      </div>
+    </aside>
+  </div>`;
 }
 function sceneCard(s, total) {
   const editing=state.editing===s.id;
@@ -91,13 +377,16 @@ function scriptView() {
   const formatIssues=p.scenes.filter(s=>s.decision==='pending'&&s.issues?.some(issue=>issue.includes('Lời đọc còn chữ số')||issue.includes('Lời đọc còn viết tắt'))).length;
   const canRegenerate=p.scenes.length&&p.scenes.every(s=>s.decision==='pending');
   const target=p.scriptPlan?.sceneCount||p.scenes.length, estimatedSeconds=Math.round(p.scenes.filter(s=>s.decision!=='rejected').reduce((n,s)=>n+s.text.split(/\s+/).filter(Boolean).length,0)/2.9);
-  return `${header('03 / BẢN THẢO CÓ CĂN CỨ','Từng câu, <em>từng bằng chứng.</em>',esc(p.brief.topic),`<div class="button-row"><button class="button secondary" data-action="approve-all-scenes">✓ Duyệt tất cả cảnh đủ điều kiện</button><button class="button secondary" data-action="to-sources">← Xem lại nguồn</button></div>`) }${steps(2)}${demoBanner()}
+  return `${steps(2)}${demoBanner()}
+  <div class="script-toolbar">
+    <div class="stat-pills"><span class="stat-pill"><b>${p.scenes.length}/${target}</b> cảnh toàn bài</span><span class="stat-pill"><b>${accepted}</b> đã chấp nhận</span><span class="stat-pill"><b>${p.scenes.filter(s=>s.status==='NEEDS_VERIFY').length}</b> cần đối chiếu ý nghĩa</span><span class="stat-pill"><b>${estimatedSeconds}</b> giây đọc / mục tiêu ${p.brief.duration} phút</span></div>
+    <div class="button-row"><button class="button secondary small" data-action="approve-all-scenes">✓ Duyệt tất cả cảnh đủ điều kiện</button><button class="button secondary small" data-action="to-sources">← Xem lại nguồn</button></div>
+  </div>
   ${need?`<div class="banner error">${need} câu mất căn cứ sau khi bỏ nguồn. Các câu khác giữ nguyên. <button class="text-button" data-action="repair">Viết lại phần bị ảnh hưởng →</button></div>`:''}
   ${canRegenerate?`<div class="banner ${malformed?'error':''}">${malformed?`${malformed} cảnh chưa đúng mẫu. `:'Bạn chưa duyệt hoặc bỏ cảnh nào nên có thể '}Viết lại toàn bài sẽ tạo lại toàn bộ lời dạy từ evidence hiện có. <button class="text-button" data-action="regenerate">Viết lại toàn bài →</button></div>`:''}
   ${formatIssues?`<div class="banner">${formatIssues} cảnh còn chữ số hoặc viết tắt trong lời đọc. <button class="text-button" data-action="normalize-format">Tự chuẩn hóa lời đọc →</button><br><span class="tiny">Chỉ đổi cách đọc số và mở rộng viết tắt; không đổi giá trị, nguồn hay quyết định kiểm chứng.</span></div>`:''}
   ${p.scenes.length && (estimatedSeconds<p.brief.duration*60*.85 || p.scenes.some(s=>s.status==='NO_SOURCE'))?'<div class="banner error">Bản nháp còn thiếu nội dung hoặc chưa đủ thời lượng. Bổ sung học liệu chuyên sâu rồi viết lại; không dùng các câu lặp để kéo dài bài.</div>':''}
   ${p.scriptPlan?.missingEvidence?.length?`<div class="banner"><strong>Phần còn thiếu căn cứ</strong><ul>${p.scriptPlan.missingEvidence.map(item=>`<li>${esc(item)}</li>`).join('')}</ul></div>`:''}
-  <div class="stat-pills"><span class="stat-pill"><b>${p.scenes.length}/${target}</b> cảnh toàn bài</span><span class="stat-pill"><b>${accepted}</b> đã chấp nhận</span><span class="stat-pill"><b>${p.scenes.filter(s=>s.status==='NEEDS_VERIFY').length}</b> cần đối chiếu ý nghĩa</span><span class="stat-pill"><b>${estimatedSeconds}</b> giây đọc / mục tiêu ${p.brief.duration} phút</span></div>
   <div class="scene-list">${p.scenes.length?p.scenes.map(s=>sceneCard(s,p.scenes.length)).join(''):'<div class="empty-state"><div class="empty-icon">≡</div><h2>Nguồn sẵn sàng, bài học bắt đầu</h2><p>Duyệt hồ sơ nguồn trước khi tạo kịch bản đầy đủ có trích dẫn.</p><button class="button primary" data-action="to-sources">Đến hồ sơ nguồn →</button></div>'}</div>
   ${p.scenes.length?'<div class="form-bottom"><p class="tiny">Lời giảng được soạn để đọc nguyên văn. Thời lượng ước tính theo 2,9 tiếng/giây, chưa gồm dừng hình và thao tác. Độ dài không bảo đảm độ đúng; từng slide vẫn phải được đối chiếu nguồn.</p><button class="button primary" data-action="to-export">Duyệt & xuất kịch bản →</button></div>':''}`;
 }
@@ -105,7 +394,7 @@ function exportView() {
   const p=state.project, accepted=p.scenes.filter(s=>s.decision==='accepted').length, pending=p.scenes.filter(s=>s.decision==='pending').length;
   const ready=accepted>0&&pending===0;
   const files=[['markdown','MD','script.md','Kịch bản đúng mẫu, có bằng chứng'],['script','JSON','script.json','Câu / cảnh để chuyển sang C4'],['profile','JSON','source-profile.json','Tác giả, ngày, đánh giá & claim'],['trace','JSON','trace.json','Liên kết từng câu với nguồn'],['audit','JSON','audit-log.json','Lịch sử duyệt và thay đổi']];
-  return `${header('04 / HOÀN TẤT BẢN THẢO','Sẵn sàng để <em>người thật duyệt.</em>','Giảng viên là người quyết định bản kịch bản được chuyển sang dựng video.')}${steps(3)}${demoBanner()}
+  return `${steps(3)}${demoBanner()}
   ${!ready?`<div class="banner">Còn ${pending} câu chờ quyết định; ${accepted} câu được chấp nhận. <button class="text-button" data-action="to-script">Quay lại đối chiếu →</button></div>`:''}
   <div class="export-grid"><section class="card"><div class="card-heading"><h2>Bộ bàn giao</h2><span class="badge">${accepted} câu đã duyệt</span></div>${files.map(([key,type,name,desc])=>`<div class="download-item"><span class="download-icon">${type}</span><div><strong>${name}</strong><p>${desc}</p></div><button class="button secondary small" data-action="download" data-key="${key}" ${!p.teacherApproval?'disabled':''} aria-label="Tải ${name}">↓ Tải</button></div>`).join('')}<div class="rule"></div><p class="tiny">Tệp tải xuống chứa trích đoạn cần thiết và đường dẫn gốc. Không xuất toàn bộ nội dung đã thu thập; người dùng chịu trách nhiệm quyền sử dụng.</p></section>
   <section class="card"><div class="eyebrow">GIẢNG VIÊN DUYỆT CUỐI</div><h2>Kiểm soát trước khi xuất</h2><p class="subtitle">Mỗi lần sửa câu hoặc thay đổi nguồn sẽ hủy xác nhận này và yêu cầu duyệt lại.</p>${p.teacherApproval?`<div class="banner success">✓ Đã duyệt bởi ${esc(p.teacherApproval.reviewer)}<br>${day(p.teacherApproval.at)} · ${accepted} câu được giữ</div>`:`<form id="teacher-form"><label class="field"><span class="field-label">Mã người duyệt</span><input name="reviewer" required maxlength="80" placeholder="Ví dụ: GV01 — không cần tên cá nhân"></label><label class="checkbox-row"><input name="confirmed" type="checkbox" required ${!ready?'disabled':''}><span>Tôi là giảng viên/người phụ trách nội dung, đã kiểm tra ý nghĩa, số liệu, nguồn, quyền sử dụng và đồng ý bản này để chuyển sang dựng video.</span></label><button class="button primary full-width" type="submit" ${!ready?'disabled':''}>Xác nhận bản cuối</button><p class="field-hint">Bản cục bộ dùng xác nhận tự khai, chưa xác thực danh tính qua tài khoản.</p></form>`}</section></div>`;
@@ -146,7 +435,7 @@ async function run(action,message,viewAfter=state.view,restore={}) {
   if(state.busy)return;state.busy=true;state.output=null;shell();
   const previousTop=window.scrollY;
   $('#workspace').innerHTML=`<div class="loading-panel" role="status"><span class="spinner"></span><h2>${esc(message)}</h2><p>Đang xử lý yêu cầu thật. Tài liệu đã lưu sẽ được giữ lại nếu có lỗi.</p><p>Với tìm web, hệ thống sẽ tải và đối chiếu từng nguồn; có thể cần một vài phút.</p></div>`;
-  try { const result=await action();if(result?.id){state.project=result;remember(result.id);}state.view=viewAfter;await bootstrap(); }
+  try { const result=await action();if(result?.id){state.project=result;remember(result.id);}if(viewAfter!==undefined)state.view=viewAfter;await bootstrap(); }
   catch(e) { notice(e.message,true);if(state.project){try{state.project=await api(`/api/projects/${state.project.id}`);}catch{}} }
   finally {
     state.busy=false;render();
@@ -176,12 +465,17 @@ document.addEventListener('click',async e=>{
   const action=button.dataset.action,id=button.dataset.id;
   if(action==='close-dialog')return $('#detail-dialog').close();
   if(action==='close-delete')return $('#delete-dialog').close();
+  if(action==='toggle-theme')return toggleTheme();
   if(action==='help')return help();
   if(state.busy)return;
   if(action==='new'){state.project=null;state.view='brief';state.editing=null;remember(null);render();return;}
   if(action==='navigate'){state.view=button.dataset.view;state.editing=null;render();return;}
   if(action.startsWith('to-')){state.view=action.slice(3);state.editing=null;render();window.scrollTo(0,0);return;}
-  if(action==='open')return run(()=>api(`/api/projects/${id}`),'Đang mở bản đã lưu…','sources');
+  if(action==='open')return run(async()=>{
+    const p = await api(`/api/projects/${id}`);
+    state.view = p.scenes?.length ? 'script' : 'sources';
+    return p;
+  },'Đang mở bản đã lưu…', undefined);
   if(action==='demo')return run(async()=>{
     state.project=await api('/api/projects',{topic:'Vì sao câu trả lời của mô hình cần được kiểm chứng?',goal:'Biết đối chiếu câu trả lời với tài liệu trước khi viết bài giảng.',audience:'Người mới tìm hiểu về mô hình học máy',duration:3,mode:'demo'});
     return post('research');
@@ -231,6 +525,15 @@ document.addEventListener('click',async e=>{
   }
   if(action==='delete')return $('#delete-dialog').showModal();
   if(action==='confirm-delete'){$('#delete-dialog').close();return run(async()=>{await post('delete',{confirmed:true});state.project=null;remember(null);},'Đang xóa dữ liệu dự án…','brief');}
+  if(action==='fill-topic'){
+    const input=$('input[name="topic"]');
+    if(input){
+      input.value=button.dataset.fill;
+      input.focus();
+      updateLiveBlueprint();
+    }
+    return;
+  }
 });
 document.addEventListener('submit',async e=>{
   e.preventDefault();if(state.busy)return;const form=e.target,data=Object.fromEntries(new FormData(form));
@@ -245,6 +548,8 @@ document.addEventListener('submit',async e=>{
   if(form.classList.contains('scene-edit')){const id=form.dataset.scene;return run(async()=>{const p=await post(`scenes/${id}`,{...data,action:'edit'});state.editing=null;return p;},'Đang lưu nội dung và kiểm tra mẫu…','script',{keepPosition:true,anchorId:`scene-${id}`});}
   if(form.id==='teacher-form')return run(()=>post('teacher',{reviewer:data.reviewer,confirmed:data.confirmed==='on'}),'Đang ghi xác nhận của giảng viên…','export');
 });
+document.addEventListener('input',e=>{if(e.target.closest('#brief-form'))updateLiveBlueprint();});
+document.addEventListener('change',e=>{if(e.target.closest('#brief-form'))updateLiveBlueprint();});
 try {
   await bootstrap();
   let id;try{id=localStorage.getItem('scriptforge.project');}catch{}
